@@ -11,6 +11,7 @@ for the Orange Pi Zero.
 * Pinouts diagram from https://kaspars.net/blog/linux/orange-pi-zero-gpio
 
 ## References
+* http://linux-sunxi.org/GPIO
 * https://forum.armbian.com/index.php?/topic/1471-solved-difficulty-accessing-gpio-via-the-sunxi-gpio-export-interface/
 * https://forum.armbian.com/index.php?/topic/3655-guide-orange-pi-zero-gpios/
 * https://jsfiddle.net/tuav7f6q/2/
