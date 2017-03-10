@@ -1,16 +1,17 @@
-# OPi.GPIO
+OPi.GPIO
+========
 
 A drop-in replacement library for [RPi.GPIO](https://sourceforge.net/projects/raspberry-gpio-python/)
 for the Orange Pi Zero.
 
-![pinouts](doc/images/orange-pi-zero-gpio-pins-800x746.png?raw=true)
+.. image:: doc/images/orange-pi-zero-gpio-pins-800x746.png?raw=true
 
-
-## Attribution
-
+Attribution
+-----------
 * Pinouts diagram from https://kaspars.net/blog/linux/orange-pi-zero-gpio
 
-## References
+References
+----------
 * http://linux-sunxi.org/GPIO
 * https://forum.armbian.com/index.php?/topic/1471-solved-difficulty-accessing-gpio-via-the-sunxi-gpio-export-interface/
 * https://forum.armbian.com/index.php?/topic/3655-guide-orange-pi-zero-gpios/
@@ -18,9 +19,9 @@ for the Orange Pi Zero.
 * https://www.mysensors.org/build/orange
 * https://kaspars.net/blog/linux/orange-pi-zero-gpio
 
-## License
-
-### MIT License
+License
+-------
+The MIT License
 
 Copyright (c) 2017 Richard Hull
 
