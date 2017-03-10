@@ -34,9 +34,6 @@ GPIO.PUD_UP = 2
 # From: https://sourceforge.net/p/raspberry-gpio-python/code/ci/default/tree/source/common.h
 GPIO.BOARD = 10
 GPIO.BCM = 11
-GPIO.SERIAL = 40
-GPIO.SPI = 41
-GPIO.I2C = 42
-GPIO.PWM = 43
+GPIO.SUNXI = 12  # made up :]
 
 sys.modules[__name__] = GPIO
