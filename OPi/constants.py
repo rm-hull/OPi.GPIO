@@ -19,8 +19,8 @@ class _const:
 GPIO = _const()
 
 # From: https://sourceforge.net/p/raspberry-gpio-python/code/ci/default/tree/source/c_gpio.h#l42
-GPIO.INPUT = 1
-GPIO.OUTPUT = 0
+GPIO.IN = 1
+GPIO.OUT = 0
 GPIO.ALT0 = 4
 
 GPIO.HIGH = 1

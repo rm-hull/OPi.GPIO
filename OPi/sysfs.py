@@ -2,7 +2,8 @@
 # Copyright (c) 2017 Richard Hull
 # See LICENSE.md for details.
 
-from OPi.constants import HIGH, LOW, INPUT, OUTPUT
+from OPi.constants import HIGH, LOW, IN, OUT, \
+    NONE, RISING, FALLING, BOTH
 
 
 def export(pin):
@@ -18,10 +19,10 @@ def unexport(pin):
 
 
 def direction(pin, dir):
-    assert dir in [INPUT, OUTPUT]
+    assert dir in [IN, OUT]
     path = "/sys/class/gpio/gpio{0}/direction".format(pin)
     with open(path, "w") as fp:
-        if dir == INPUT:
+        if dir == IN:
             fp.write("in")
         else:
             fp.write("out")

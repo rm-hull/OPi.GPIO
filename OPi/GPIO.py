@@ -2,7 +2,7 @@
 # Copyright (c) 2017 Richard Hull
 # See LICENSE.md for details.
 
-from OPi.constants import HIGH, LOW, BCM, BOARD, SUNXI, INPUT, OUTPUT  # noqa: F401
+from OPi.constants import HIGH, LOW, BCM, BOARD, SUNXI, IN, OUT  # noqa: F401
 from OPi.pin_mappings import get_gpio_pin
 from OPi import sysfs
 
@@ -39,7 +39,7 @@ def setup(channel, direction, initial=LOW, pull_up_down=None):
         pin = get_gpio_pin(_mode, channel)
         sysfs.export(pin)
         sysfs.direction(pin, direction)
-        if direction == OUTPUT:
+        if direction == OUT:
             sysfs.output(pin, initial)
 
         _exports.append(channel)
