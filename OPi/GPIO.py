@@ -2,7 +2,7 @@
 # Copyright (c) 2017 Richard Hull
 # See LICENSE.md for details.
 
-from OPi.constants import HIGH, LOW, BCM, BOARD, SUNXI, INPUT, OUTPUT
+from OPi.constants import HIGH, LOW, BCM, BOARD, SUNXI, INPUT, OUTPUT  # noqa: F401
 from OPi.pin_mappings import get_gpio_pin
 from OPi import sysfs
 
