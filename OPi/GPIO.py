@@ -3,6 +3,7 @@
 # See LICENSE.md for details.
 
 from OPi.constants import HIGH, LOW, BCM, BOARD, SUNXI, INPUT, OUTPUT
+from OPi.pin_mappings import get_gpio_pin
 from OPi import sysfs
 
 _mode = None
@@ -35,17 +36,19 @@ def setup(channel, direction, initial=LOW, pull_up_down=None):
     else:
         if channel in _exports:
             raise RuntimeError("Channel {0} is already configured".format(channel))
-        sysfs.export(_mode, channel)
-        sysfs.direction(_mode, channel, direction)
+        pin = get_gpio_pin(_mode, channel)
+        sysfs.export(pin)
+        sysfs.direction(pin, direction)
         if direction == OUTPUT:
-            sysfs.output(_mode, channel, initial)
+            sysfs.output(pin, initial)
 
         _exports.append(channel)
 
 
 def input(channel):
     _check_configured(channel)
-    return sysfs.input(_mode, channel)
+    pin = get_gpio_pin(_mode, channel)
+    return sysfs.input(pin)
 
 
 def output(channel, state):
@@ -54,7 +57,8 @@ def output(channel, state):
             output(ch, state)
     else:
         _check_configured(channel)
-        return sysfs.output(_mode, channel, state)
+        pin = get_gpio_pin(_mode, channel)
+        return sysfs.output(pin, state)
 
 
 def cleanup(channel=None):
@@ -65,5 +69,6 @@ def cleanup(channel=None):
             cleanup(ch)
     else:
         _check_configured(channel)
-        sysfs.unexport(_mode, channel)
+        pin = get_gpio_pin(_mode, channel)
+        sysfs.unexport(pin)
         _exports.remove(channel)

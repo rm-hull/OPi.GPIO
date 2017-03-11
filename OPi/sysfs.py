@@ -3,27 +3,23 @@
 # See LICENSE.md for details.
 
 from OPi.constants import HIGH, LOW, INPUT, OUTPUT
-from OPi.pin_mappings import get_gpio_pin
 
 
-def export(mode, pin):
-    gpio = get_gpio_pin(mode, pin)
+def export(pin):
     path = "/sys/class/gpio/export"
     with open(path, "w") as fp:
-        fp.write(str(gpio))
+        fp.write(str(pin))
 
 
-def unexport(mode, pin):
-    gpio = get_gpio_pin(mode, pin)
+def unexport(pin):
     path = "/sys/class/gpio/unexport"
     with open(path, "w") as fp:
-        fp.write(str(gpio))
+        fp.write(str(pin))
 
 
-def direction(mode, pin, dir):
+def direction(pin, dir):
     assert dir in [INPUT, OUTPUT]
-    gpio = get_gpio_pin(mode, pin)
-    path = "/sys/class/gpio/gpio{0}/direction".format(gpio)
+    path = "/sys/class/gpio/gpio{0}/direction".format(pin)
     with open(path, "w") as fp:
         if dir == INPUT:
             fp.write("in")
@@ -31,9 +27,8 @@ def direction(mode, pin, dir):
             fp.write("out")
 
 
-def input(mode, pin):
-    gpio = get_gpio_pin(mode, pin)
-    path = "/sys/class/gpio/gpio{0}/value".format(gpio)
+def input(pin):
+    path = "/sys/class/gpio/gpio{0}/value".format(pin)
     with open(path, "r") as fp:
         value = fp.read()
         if value.strip() == str(LOW):
@@ -42,18 +37,16 @@ def input(mode, pin):
             return HIGH
 
 
-def output(mode, pin, value):
+def output(pin, value):
     assert value in [HIGH, LOW]
-    gpio = get_gpio_pin(mode, pin)
-    path = "/sys/class/gpio/gpio{0}/value".format(gpio)
+    path = "/sys/class/gpio/gpio{0}/value".format(pin)
     with open(path, "w") as fp:
         fp.write(str(value))
 
 
-#def edge(mode, pin, trigger):
+# def edge(pin, trigger):
 #    assert trigger in [] # none, rising, falling, both
-#    gpio = get_gpio_pin(mode, pin)
-#    path = "/sys/class/gpio/gpio{0}/edge".format(gpio)
+#    path = "/sys/class/gpio/gpio{0}/edge".format(pin)
 #    with open(path, "w") as fp:
 #        fp.write("none")
 #    with open(path, "w") as fp:
