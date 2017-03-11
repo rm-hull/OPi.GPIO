@@ -7,6 +7,9 @@ OPi.GPIO
 .. image:: https://coveralls.io/repos/github/rm-hull/OPi.GPIO/badge.svg?branch=master
    :target: https://coveralls.io/github/rm-hull/OPi.GPIO?branch=master
 
+.. image:: https://readthedocs.org/projects/opi-gpio/badge/?version=latest
+   :target: http://opi-gpio.readthedocs.io/en/latest/?badge=latest
+
 .. image:: https://img.shields.io/pypi/pyversions/OPi.GPIO.svg
    :target: https://pypi.python.org/pypi/OPi.GPIO
 

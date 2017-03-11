@@ -64,7 +64,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'OPi.GPIO: SBC display drivers'
+project = 'OPi.GPIO: Orange Pi Zero RPi.GPIO compatibility library'
 author = 'Richard Hull and contributors'
 copyright = u'{0}, {1}'.format(datetime.now().year, author)
 
