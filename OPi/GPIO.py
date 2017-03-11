@@ -271,6 +271,7 @@ def cleanup(channel=None):
     """
     if channel is None:
         cleanup(_exports)
+        global _mode
         _mode = None
     elif isinstance(channel, list):
         for ch in channel:
