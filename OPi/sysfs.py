@@ -45,10 +45,14 @@ def output(pin, value):
         fp.write(str(value))
 
 
-# def edge(pin, trigger):
-#    assert trigger in [] # none, rising, falling, both
-#    path = "/sys/class/gpio/gpio{0}/edge".format(pin)
-#    with open(path, "w") as fp:
-#        fp.write("none")
-#    with open(path, "w") as fp:
-#        fp.write("none")
+def edge(pin, trigger):
+    assert trigger in [NONE, RISING, FALLING, BOTH]
+    path = "/sys/class/gpio/gpio{0}/edge".format(pin)
+    opts = {
+        NONE: "none",
+        RISING: "rising",
+        FALLING: "falling",
+        BOTH: "both"
+    }
+    with open(path, "w") as fp:
+        fp.write(opts[trigger])

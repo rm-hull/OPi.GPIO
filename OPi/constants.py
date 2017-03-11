@@ -35,4 +35,9 @@ GPIO.BOARD = 10
 GPIO.BCM = 11
 GPIO.SUNXI = 12  # made up :]
 
+GPIO.NONE = 0
+GPIO.RISING = 1
+GPIO.FALLING = 2
+GPIO.BOTH = 3
+
 sys.modules[__name__] = GPIO
