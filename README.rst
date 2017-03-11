@@ -1,7 +1,7 @@
 OPi.GPIO
 ========
 
-A drop-in replacement library for `RPi.GPIO <https://sourceforge.net/projects/raspberry-gpio-python/`>_
+A drop-in replacement library for `RPi.GPIO <https://sourceforge.net/projects/raspberry-gpio-python/>`_
 for the Orange Pi Zero. Only the basic GPIO functions are replicated, using sysfs: this allows
 the GPIO pins to be accessed from user space.
 
