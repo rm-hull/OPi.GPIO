@@ -1,12 +1,12 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Copyright (c) 2017 Richard Hull
 # See LICENSE.md for details.
 
+import functools
 from OPi.constants import BOARD, BCM, SUNXI
 
 
-class sunXi(object):
+class _sunXi(object):
 
     def __getitem__(self, value):
 
@@ -63,10 +63,15 @@ _pin_map = {
         27: 0
     },
 
-    SUNXI: sunXi()
+    SUNXI: _sunXi()
 }
 
 
-def get_gpio_pin(mode, pin):
+def get_gpio_pin(mode, channel):
     assert mode in [BOARD, BCM, SUNXI]
-    return _pin_map[mode][pin]
+    return _pin_map[mode][channel]
+
+
+bcm = functools.partial(get_gpio_pin, BCM)
+board = functools.partial(get_gpio_pin, BOARD)
+sunxi = functools.partial(get_gpio_pin, SUNXI)
