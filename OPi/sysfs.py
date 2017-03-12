@@ -2,8 +2,16 @@
 # Copyright (c) 2017 Richard Hull
 # See LICENSE.md for details.
 
+from contextlib import contextmanager
 from OPi.constants import HIGH, LOW, IN, OUT, \
     NONE, RISING, FALLING, BOTH
+
+
+@contextmanager
+def value_descriptor(pin, mode="r"):
+    path = "/sys/class/gpio/gpio{0}/value".format(pin)
+    with open(path, mode) as fp:
+        yield fp
 
 
 def export(pin):
@@ -29,8 +37,7 @@ def direction(pin, dir):
 
 
 def input(pin):
-    path = "/sys/class/gpio/gpio{0}/value".format(pin)
-    with open(path, "r") as fp:
+    with value_descriptor(pin) as fp:
         value = fp.read()
         if value.strip() == str(LOW):
             return LOW
@@ -40,8 +47,7 @@ def input(pin):
 
 def output(pin, value):
     assert value in [HIGH, LOW]
-    path = "/sys/class/gpio/gpio{0}/value".format(pin)
-    with open(path, "w") as fp:
+    with value_descriptor(pin, "w") as fp:
         fp.write(str(value))
 
 

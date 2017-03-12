@@ -30,6 +30,7 @@ Attribution
 
 References
 ----------
+* https://www.kernel.org/doc/Documentation/gpio/sysfs.txt
 * http://linux-sunxi.org/GPIO
 * https://forum.armbian.com/index.php?/topic/1471-solved-difficulty-accessing-gpio-via-the-sunxi-gpio-export-interface/
 * https://forum.armbian.com/index.php?/topic/3655-guide-orange-pi-zero-gpios/
