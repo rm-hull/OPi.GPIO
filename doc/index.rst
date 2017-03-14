@@ -15,7 +15,7 @@ OPi.GPIO
    :target: https://pypi.python.org/pypi/OPi.GPIO
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    install
    api-documentation
