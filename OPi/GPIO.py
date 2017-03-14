@@ -81,8 +81,8 @@ there are two ways to get round this:
 * the :py:func:`event_detected` function
 * a threaded callback function that is run when an edge is detected
 
-Outputs Usage
--------------
+Outputs
+-------
 1. First set up OPi.GPIO
 
     .. code:: python
@@ -143,8 +143,7 @@ from OPi.constants import LOW, HIGH                     # noqa: F401
 from OPi.constants import NONE, RISING, FALLING, BOTH   # noqa: F401
 from OPi.constants import BCM, BOARD, SUNXI
 from OPi.pin_mappings import get_gpio_pin
-from OPi import sysfs
-from OPi import event
+from OPi import event, sysfs
 
 _gpio_warnings = True
 _mode = None
@@ -153,7 +152,7 @@ _exports = {}
 
 def _check_configured(channel, direction=None):
     configured = _exports.get(channel)
-    if not configured:
+    if configured is None:
         raise RuntimeError("Channel {0} is not configured".format(channel))
 
     if direction is not None and direction != configured:
@@ -173,13 +172,13 @@ def getmode():
 
 def setmode(mode):
     """
-    You must call this prior to using other calls.
+    You must call this method prior to using all other calls.
 
     :param mode: the mode, one of :py:attr:`GPIO.BOARD`, :py:attr:`GPIO.BCM` or
         :py:attr:`GPIO.SUNXI` only.
     """
-    global _mode
     assert mode in [BCM, BOARD, SUNXI]
+    global _mode
     _mode = mode
 
 
@@ -228,6 +227,9 @@ def setup(channel, direction, initial=None):
                               #   chan_list = (11,12)
        GPIO.setup(chan_list, GPIO.OUT)
     """
+    if _mode is None:
+        raise RuntimeError("Mode has not been set")
+
     if isinstance(channel, list):
         for ch in channel:
             setup(ch, direction, initial)
@@ -245,10 +247,9 @@ def setup(channel, direction, initial=None):
                 sysfs.export(pin)
 
         sysfs.direction(pin, direction)
+        _exports[channel] = direction
         if direction == OUT and initial is not None:
             sysfs.output(pin, initial)
-
-        _exports[channel] = direction
 
 
 def input(channel):
@@ -260,7 +261,7 @@ def input(channel):
     :returns: This will return either :py:attr:`0` / :py:attr:`GPIO.LOW` /
         :py:attr:`False` or :py:attr:`1` / :py:attr:`GPIO.HIGH` / :py:attr:`True`).
     """
-    _check_configured(channel, direction=IN)
+    _check_configured(channel)  # Can read from a pin configured for output
     pin = get_gpio_pin(_mode, channel)
     return sysfs.input(pin)
 
@@ -329,7 +330,7 @@ def wait_for_edge(channel, trigger, timeout=-1):
     """
     _check_configured(channel, direction=IN)
     pin = get_gpio_pin(_mode, channel)
-    if event.blocking_wait_for_edge(pin, trigger, timeout):
+    if event.blocking_wait_for_edge(pin, trigger, timeout) is not None:
         return channel
 
 

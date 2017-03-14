@@ -1,0 +1,150 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright (c) 2017 Richard Hull
+# See LICENSE.rst for details.
+
+"""
+Tests for the :py:mod:`OPi.GPIO` module.
+"""
+try:
+    from unittest.mock import patch, call
+except ImportError:
+    from mock import patch, call
+
+import pytest
+import OPi.GPIO as GPIO
+
+
+def setup():
+    with patch("OPi.GPIO.sysfs"):
+        GPIO.cleanup()
+
+
+def test_mode():
+    assert GPIO.getmode() is None
+    GPIO.setmode(GPIO.BCM)
+    assert GPIO.getmode() == GPIO.BCM
+    GPIO.cleanup()
+    assert GPIO.getmode() is None
+    with pytest.raises(AssertionError):
+        GPIO.setmode("Sausages")
+
+
+def test_setup_with_no_mode():
+    with pytest.raises(RuntimeError) as ex:
+        GPIO.setup(3, GPIO.IN)
+    assert str(ex.value) == "Mode has not been set"
+
+
+def test_setup_single_input_channel():
+    with patch("OPi.GPIO.sysfs") as mock:
+        GPIO.setmode(GPIO.SUNXI)
+        GPIO.setup("PA01", GPIO.IN)
+        mock.export.assert_called_with(1)
+        mock.direction.assert_called_with(1, GPIO.IN)
+        assert "PA01" in GPIO._exports
+
+
+def test_setup_single_output_channel():
+    with patch("OPi.GPIO.sysfs") as mock:
+        GPIO.setmode(GPIO.SUNXI)
+        GPIO.setup("PG07", GPIO.OUT)
+        mock.export.assert_called_with(199)
+        mock.direction.assert_called_with(199, GPIO.OUT)
+        mock.output.assert_not_called()
+        assert "PG07" in GPIO._exports
+
+
+def test_setup_single_output_channel_with_initial_value():
+    with patch("OPi.GPIO.sysfs") as mock:
+        GPIO.setmode(GPIO.SUNXI)
+        GPIO.setup("PG06", GPIO.OUT, GPIO.HIGH)
+        mock.export.assert_called_with(198)
+        mock.direction.assert_called_with(198, GPIO.OUT)
+        mock.output.assert_called_with(198, GPIO.HIGH)
+        assert "PG06" in GPIO._exports
+
+
+def test_input_not_configured():
+    with pytest.raises(RuntimeError) as ex:
+        GPIO.input(12)
+    assert str(ex.value) == "Channel 12 is not configured"
+
+
+def test_input():
+    with patch("OPi.GPIO.sysfs") as mock:
+        mock.input.return_value = GPIO.HIGH
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(23, GPIO.IN)
+        assert GPIO.input(23) == GPIO.HIGH
+        mock.input.assert_called_with(14)
+
+
+def test_input_not_configured_for_output():
+    with patch("OPi.GPIO.sysfs"):
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(23, GPIO.IN)
+        with pytest.raises(RuntimeError) as ex:
+            GPIO.output(23, GPIO.LOW)
+        assert str(ex.value) == "Channel 23 is configured for input"
+
+
+def test_output_not_configured():
+    with pytest.raises(RuntimeError) as ex:
+        GPIO.output(12, GPIO.LOW)
+    assert str(ex.value) == "Channel 12 is not configured"
+
+
+def test_output():
+    with patch("OPi.GPIO.sysfs") as mock:
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(23, GPIO.OUT)
+        GPIO.output(23, GPIO.LOW)
+        mock.output.assert_called_with(14, GPIO.LOW)
+
+
+def test_multiple_output():
+    with patch("OPi.GPIO.sysfs") as mock:
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup([23, 13, 3], GPIO.OUT)
+        GPIO.output([23, 13, 3], GPIO.LOW)
+        mock.output.assert_has_calls([
+            call(14, GPIO.LOW),
+            call(0, GPIO.LOW),
+            call(12, GPIO.LOW)
+        ])
+
+
+def test_input_and_output():
+    with patch("OPi.GPIO.sysfs") as mock:
+        mock.input.return_value = GPIO.HIGH
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(23, GPIO.OUT)
+        GPIO.output(23, not GPIO.input(23))
+        mock.input.assert_called_with(14)
+        mock.output.assert_called_with(14, GPIO.LOW)
+
+
+def test_wait_for_edge_not_configured():
+    with pytest.raises(RuntimeError) as ex:
+        GPIO.wait_for_edge(91, GPIO.RISING)
+    assert str(ex.value) == "Channel 91 is not configured"
+
+
+def test_wait_for_edge_not_configured_for_input():
+    with patch("OPi.GPIO.sysfs"):
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(12, GPIO.OUT)
+        with pytest.raises(RuntimeError) as ex:
+            GPIO.wait_for_edge(12, GPIO.RISING)
+        assert str(ex.value) == "Channel 12 is configured for output"
+
+
+def test_wait_for_edge_completes():
+    with patch("OPi.GPIO.sysfs"):
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(12, GPIO.IN)
+        with patch("OPi.GPIO.event") as mock:
+            mock.blocking_wait_for_edge.return_value = 1
+            assert GPIO.wait_for_edge(12, GPIO.BOTH) == 12
+            mock.blocking_wait_for_edge.assert_called_with(7, GPIO.BOTH, -1)
