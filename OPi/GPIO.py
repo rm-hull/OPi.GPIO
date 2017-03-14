@@ -36,6 +36,8 @@ across Raspberry Pi and Orange Pi. Quoting from the RPi.GPIO documentation:
 This library monkeys the original implementation (and the documentation, as you
 are about to find out), by adding a third numbering system that is SUNXI naming.
 
+.. image:: doc/images/OrangePi_Zero_Pinout_header.jpg?raw=true
+
 Inputs
 ------
 There are several ways of getting GPIO input into your program. The first and

@@ -19,14 +19,11 @@ OPi.GPIO
 .. image:: https://img.shields.io/maintenance/yes/2017.svg?maxAge=2592000
 
 A drop-in replacement library for `RPi.GPIO <https://sourceforge.net/projects/raspberry-gpio-python/>`_
-for the Orange Pi Zero. Only the basic GPIO functions are replicated, using sysfs: this allows
-the GPIO pins to be accessed from user space.
+for the Orange Pi Zero. Only the basic GPIO functions are replicated,
+using sysfs: this allows the GPIO pins to be accessed from user space.
 
-.. image:: doc/images/orange-pi-zero-gpio-pins-800x746.png?raw=true
-
-Attribution
------------
-* Pinouts diagram from https://kaspars.net/blog/linux/orange-pi-zero-gpio
+See the `documentation <https://opi-gpio.readthedocs.io>`_ for install
+instructions and detailed API usage.
 
 References
 ----------
