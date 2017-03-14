@@ -14,8 +14,13 @@ OPi.GPIO
 .. image:: https://img.shields.io/pypi/v/OPi.GPIO.svg
    :target: https://pypi.python.org/pypi/OPi.GPIO
 
+OPi-GPIO is a drop-in replacement library for `RPi.GPIO
+<https://sourceforge.net/projects/raspberry-gpio-python/>`_ for the Orange Pi
+Zero. Only the basic GPIO functions are replicated, using sysfs: this allows
+the GPIO pins to be accessed from user space.
+
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    install
    api-documentation
