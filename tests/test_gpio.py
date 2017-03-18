@@ -33,6 +33,8 @@ def test_mode():
 def test_warnings():
     GPIO.setwarnings(False)
     assert not GPIO._gpio_warnings
+    GPIO.setwarnings(True)
+    assert GPIO._gpio_warnings
 
 
 def test_setup_with_no_mode():

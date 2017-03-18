@@ -466,6 +466,7 @@ def cleanup(channel=None):
     """
     if channel is None:
         cleanup(list(_exports.keys()))
+        setwarnings(True)
         global _mode
         _mode = None
     elif isinstance(channel, list):
