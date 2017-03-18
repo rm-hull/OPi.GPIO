@@ -55,6 +55,18 @@ def test_setup_single_output_channel():
         assert "PG07" in GPIO._exports
 
 
+def test_setup_channel_in_use():
+    with patch("OPi.GPIO.sysfs") as mock:
+        GPIO.setmode(GPIO.SUNXI)
+        mock.export.side_effect = [OSError(16, "test"), None]
+        GPIO.setup("PG07", GPIO.OUT)
+        mock.export.assert_called_with(199)
+        mock.unexport.assert_called_with(199)
+        mock.direction.assert_called_with(199, GPIO.OUT)
+        mock.output.assert_not_called()
+        assert "PG07" in GPIO._exports
+
+
 def test_setup_single_output_channel_with_initial_value():
     with patch("OPi.GPIO.sysfs") as mock:
         GPIO.setmode(GPIO.SUNXI)
@@ -148,3 +160,91 @@ def test_wait_for_edge_completes():
             mock.blocking_wait_for_edge.return_value = 1
             assert GPIO.wait_for_edge(12, GPIO.BOTH) == 12
             mock.blocking_wait_for_edge.assert_called_with(7, GPIO.BOTH, -1)
+
+
+def test_add_event_detect():
+    with patch("OPi.GPIO.sysfs"):
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(23, GPIO.IN)
+        with patch("OPi.GPIO.event") as mock:
+            GPIO.add_event_detect(23, GPIO.BOTH)
+            mock.add_edge_detect.assert_called_with(14, GPIO.BOTH, None)
+
+
+def test_add_event_detect_not_configured_for_input():
+    with patch("OPi.GPIO.sysfs"):
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(23, GPIO.OUT)
+        with pytest.raises(RuntimeError) as ex:
+            GPIO.add_event_detect(23, GPIO.FALLING)
+        assert str(ex.value) == "Channel 23 is configured for output"
+
+
+def test_remove_event_detect():
+    with patch("OPi.GPIO.sysfs"):
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(23, GPIO.IN)
+        with patch("OPi.GPIO.event") as mock:
+            GPIO.remove_event_detect(23)
+            mock.remove_edge_detect.assert_called_with(14)
+
+
+def test_remove_event_detect_not_configured_for_input():
+    with patch("OPi.GPIO.sysfs"):
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(23, GPIO.OUT)
+        with pytest.raises(RuntimeError) as ex:
+            GPIO.remove_event_detect(23)
+        assert str(ex.value) == "Channel 23 is configured for output"
+
+
+def test_add_event_callback():
+    with patch("OPi.GPIO.sysfs"):
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(23, GPIO.IN)
+        with patch("OPi.GPIO.event") as mock:
+            GPIO.add_event_callback(23, None)
+            mock.add_edge_callback(14, None)
+
+
+def test_add_event_callback_not_configured_for_input():
+    with patch("OPi.GPIO.sysfs"):
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(23, GPIO.OUT)
+        with pytest.raises(RuntimeError) as ex:
+            GPIO.add_event_callback(23, None)
+        assert str(ex.value) == "Channel 23 is configured for output"
+
+
+def test_event_detected():
+    with patch("OPi.GPIO.sysfs"):
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(23, GPIO.IN)
+        with patch("OPi.GPIO.event") as mock:
+            mock.edge_detected.return_value = True
+            assert GPIO.event_detected(23)
+
+
+def test_event_detected_not_configured_for_input():
+    with patch("OPi.GPIO.sysfs"):
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(23, GPIO.OUT)
+        with pytest.raises(RuntimeError) as ex:
+            GPIO.event_detected(23)
+        assert str(ex.value) == "Channel 23 is configured for output"
+
+
+def test_callback_wrapper_none():
+    assert GPIO.__wrap(None, 12) is None
+
+
+def test_callback_wrapper_not_none():
+    called = []
+
+    def cb(pin):
+        called.append(pin)
+
+    callback = GPIO.__wrap(cb, 17)
+    callback(97)
+    assert 17 in called
+    assert 97 not in called

@@ -245,6 +245,8 @@ def setup(channel, direction, initial=None):
                     warnings.warn("This channel is already in use, continuing anyway.  Use GPIO.setwarnings(False) to disable warnings.", stacklevel=2)
                 sysfs.unexport(pin)
                 sysfs.export(pin)
+            else:
+                raise e
 
         sysfs.direction(pin, direction)
         _exports[channel] = direction
