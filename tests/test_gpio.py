@@ -30,6 +30,11 @@ def test_mode():
         GPIO.setmode("Sausages")
 
 
+def test_warnings():
+    GPIO.setwarnings(False)
+    assert not GPIO._gpio_warnings
+
+
 def test_setup_with_no_mode():
     with pytest.raises(RuntimeError) as ex:
         GPIO.setup(3, GPIO.IN)
@@ -45,6 +50,18 @@ def test_setup_single_input_channel():
         assert "PA01" in GPIO._exports
 
 
+def test_setup_channel_already_setup():
+    with patch("OPi.GPIO.sysfs") as mock:
+        GPIO.setmode(GPIO.SUNXI)
+        GPIO.setup("PA01", GPIO.IN)
+        mock.export.assert_called_with(1)
+        mock.direction.assert_called_with(1, GPIO.IN)
+        assert "PA01" in GPIO._exports
+        with pytest.raises(RuntimeError) as ex:
+            GPIO.setup("PA01", GPIO.OUT)
+        assert str(ex.value) == "Channel PA01 is already configured"
+
+
 def test_setup_single_output_channel():
     with patch("OPi.GPIO.sysfs") as mock:
         GPIO.setmode(GPIO.SUNXI)
@@ -55,7 +72,7 @@ def test_setup_single_output_channel():
         assert "PG07" in GPIO._exports
 
 
-def test_setup_channel_in_use():
+def test_setup_channel_already_in_use():
     with patch("OPi.GPIO.sysfs") as mock:
         GPIO.setmode(GPIO.SUNXI)
         mock.export.side_effect = [OSError(16, "test"), None]
@@ -65,6 +82,20 @@ def test_setup_channel_in_use():
         mock.direction.assert_called_with(199, GPIO.OUT)
         mock.output.assert_not_called()
         assert "PG07" in GPIO._exports
+
+
+def test_setup_raises_OSError():
+    with patch("OPi.GPIO.sysfs") as mock:
+        GPIO.setmode(GPIO.SUNXI)
+        mock.export.side_effect = OSError(44, "test")
+        with pytest.raises(OSError) as ex:
+            GPIO.setup("PG07", GPIO.OUT)
+        assert str(ex.value) == "[Errno 44] test"
+        mock.export.assert_called_with(199)
+        mock.unexport.assert_not_called()
+        mock.direction.assert_not_called()
+        mock.output.assert_not_called()
+        assert "PG07" not in GPIO._exports
 
 
 def test_setup_single_output_channel_with_initial_value():
