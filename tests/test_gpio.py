@@ -74,7 +74,7 @@ def test_setup_single_output_channel():
         assert "PG07" in GPIO._exports
 
 
-def test_setup_channel_already_in_use():
+def test_setup_channel_already_in_use_raises_OSError():
     with patch("OPi.GPIO.sysfs") as mock:
         GPIO.setmode(GPIO.SUNXI)
         mock.export.side_effect = [OSError(16, "test"), None]
@@ -84,6 +84,18 @@ def test_setup_channel_already_in_use():
         mock.direction.assert_called_with(199, GPIO.OUT)
         mock.output.assert_not_called()
         assert "PG07" in GPIO._exports
+
+
+def test_setup_channel_already_in_use_raises_IOError():
+    with patch("OPi.GPIO.sysfs") as mock:
+        GPIO.setmode(GPIO.SUNXI)
+        mock.export.side_effect = [IOError(16, "test"), None]
+        GPIO.setup("PG06", GPIO.OUT)
+        mock.export.assert_called_with(198)
+        mock.unexport.assert_called_with(198)
+        mock.direction.assert_called_with(198, GPIO.OUT)
+        mock.output.assert_not_called()
+        assert "PG06" in GPIO._exports
 
 
 def test_setup_raises_OSError():
