@@ -239,7 +239,7 @@ def setup(channel, direction, initial=None):
         pin = get_gpio_pin(_mode, channel)
         try:
             sysfs.export(pin)
-        except OSError as e:
+        except (OSError, IOError) as e:
             if e.errno == 16:   # Device or resource busy
                 if _gpio_warnings:
                     warnings.warn("This channel is already in use, continuing anyway.  Use GPIO.setwarnings(False) to disable warnings.", stacklevel=2)
