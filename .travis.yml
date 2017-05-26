@@ -1,4 +1,4 @@
-sudo: true
+sudo: false
 language: python
 cache: pip
 
@@ -16,15 +16,8 @@ matrix:
           env: TOXENV=py37
         - python: 2.7
           env: TOXENV=qa
-    allow_failures:
-        - python: 3.7-dev
 
-addons:
-  apt:
-    packages:
-    - i2c-tools
-
-install: pip install -U pip tox coveralls
+install: pip install -U pip tox coveralls setuptools
 script: tox -vv
 after_success:
   - coveralls
