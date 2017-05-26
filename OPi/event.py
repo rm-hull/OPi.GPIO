@@ -19,6 +19,7 @@ class _worker(threading.Thread):
     # TODO: implement bouncetime
     def __init__(self, pin, trigger, callback=None):
         super(_worker, self).__init__()
+        self.daemon = True
         self._pin = pin
         self._trigger = trigger
         self._event_detected = False
