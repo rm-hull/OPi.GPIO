@@ -48,8 +48,35 @@ intensive. The other way of responding to a GPIO input is using 'interrupts'
 (edge detection). An edge is the name of a transition from HIGH to LOW (falling
 edge) or LOW to HIGH (rising edge).
 
+Pull up / Pull down resistors
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. note:: Support for pull up / pull down resistors is not yet complete: if
+   specified, a warning will be displayed instead, so that it is at least
+   compatible with existing code, but without implemening the actual
+   functionality.
+
+If you do not have the input pin connected to anything, it will 'float'. In
+other words, the value that is read in is undefined because it is not connected
+to anything until you press a button or switch. It will probably change value a
+lot as a result of receiving mains interference.
+
+To get round this, we use a pull up or a pull down resistor. In this way, the
+default value of the input can be set. It is possible to have pull up/down
+resistors in hardware and using software. In hardware, a 10K resistor between
+the input channel and 3.3V (pull-up) or 0V (pull-down) is commonly used. The
+OPi.GPIO module allows you to configure the SOC to do this in software:
+
+.. code:: python
+
+   GPIO.setup(channel, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+     # or
+   GPIO.setup(channel, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+(where channel is the channel number based on the numbering system you have
+specified - BOARD, BCM or SUNXI).
+
 Testing inputs (polling)
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 You can take a snapshot of an input at a moment in time:
 
 .. code:: python
@@ -69,7 +96,7 @@ To wait for a button press by polling in a loop:
 (this assumes that pressing the button changes the input from LOW to HIGH)
 
 Interrupts and Edge detection
------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 An edge is the change in state of an electrical signal from LOW to HIGH (rising
 edge) or from HIGH to LOW (falling edge). Quite often, we are more concerned by
 a change in state of an input than it's value. This change in state is an event.
@@ -80,6 +107,81 @@ there are two ways to get round this:
 * the :py:func:`wait_for_edge` function
 * the :py:func:`event_detected` function
 * a threaded callback function that is run when an edge is detected
+
+Threaded Callbacks
+^^^^^^^^^^^^^^^^^^
+OPi.GPIO manages a number of secondary threads for callback functions. This
+means that callback functions can be run at the same time as your main program,
+in immediate response to an edge.
+
+For example:
+
+.. code:: python
+
+    def my_callback(channel):
+        print('This is a edge event callback function!')
+        print('Edge detected on channel %s'%channel)
+        print('This is run in a different thread to your main program')
+
+    GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback)  # add rising edge detection on a channel
+    #...the rest of your program...
+
+If you wanted more than one callback function:
+
+.. code:: python
+
+    def my_callback_one(channel):
+        print('Callback one')
+
+    def my_callback_two(channel):
+        print('Callback two')
+
+    GPIO.add_event_detect(channel, GPIO.RISING)
+    GPIO.add_event_callback(channel, my_callback_one)
+    GPIO.add_event_callback(channel, my_callback_two)
+
+Note that in this case, the callback functions are run sequentially, not
+concurrently. This is because there is only one thread used for callbacks, in
+which every callback is run, in the order in which they have been defined.
+
+Switch debounce
+^^^^^^^^^^^^^^^
+.. note:: Support for switch debounce is not yet complete: if specified, a
+   warning will be displayed instead, so that it is at least compatible with
+   existing code, but without implemening the actual functionality.
+
+You may notice that the callbacks are called more than once for each button
+press. This is as a result of what is known as 'switch bounce'. There are two
+ways of dealing with switch bounce:
+
+* add a 0.1µF capacitor across your switch.
+* software debouncing
+* a combination of both
+
+To debounce using software, add the bouncetime= parameter to a function where
+you specify a callback function. Bouncetime should be specified in milliseconds.
+For example:
+
+.. code:: python
+
+   # add rising edge detection on a channel, ignoring further edges for 200ms for switch bounce handling
+   GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
+
+or
+
+.. code:: python
+
+   GPIO.add_event_callback(channel, my_callback, bouncetime=200)
+
+Remove event detection
+^^^^^^^^^^^^^^^^^^^^^^
+If for some reason, your program no longer wishes to detect edge events, it is
+possible to stop them:
+
+.. code:: python
+
+   GPIO.remove_event_detect(channel)
+
 
 Outputs
 -------
@@ -187,7 +289,7 @@ def setwarnings(enabled):
     _gpio_warnings = enabled
 
 
-def setup(channel, direction, initial=None):
+def setup(channel, direction, initial=None, pull_up_down=None):
     """
     You need to set up every channel you are using as an input or an output.
 
@@ -195,9 +297,13 @@ def setup(channel, direction, initial=None):
         (:py:attr:`GPIO.BOARD`, :py:attr:`GPIO.BCM` or :py:attr:`GPIO.SUNXI`).
     :param direction: whether to treat the GPIO pin as input or output (use only
         :py:attr:`GPIO.IN` or :py:attr:`GPIO.OUT`).
-    :param initial: When supplied and setting up an output pin, resets the pin
-        to the value given (can be :py:attr:`0` / :py:attr:`GPIO.LOW` /
+    :param initial: (optional) When supplied and setting up an output pin,
+        resets the pin to the value given (can be :py:attr:`0` / :py:attr:`GPIO.LOW` /
         :py:attr:`False` or :py:attr:`1` / :py:attr:`GPIO.HIGH` / :py:attr:`True`).
+    :param pull_up_down: (optional) When supplied and setting up an input pin,
+        configures the pin to 3.3V (pull-up) or 0V (pull-down) depending on the
+        value given (can be :py:attr:`GPIO.PUD_OFF` / :py:attr:`GPIO.PUD_UP` /
+        :py:attr:`GPIO.PUD_DOWN`)
 
     To configure a channel as an input:
 
@@ -230,6 +336,10 @@ def setup(channel, direction, initial=None):
     if _mode is None:
         raise RuntimeError("Mode has not been set")
 
+    if pull_up_down is not None:
+        if _gpio_warnings:
+            warnings.warn("Pull up/down setting are not (yet) fully supported, continuing anyway. Use GPIO.setwarnings(False) to disable warnings.", stacklevel=2)
+
     if isinstance(channel, list):
         for ch in channel:
             setup(ch, direction, initial)
@@ -242,7 +352,7 @@ def setup(channel, direction, initial=None):
         except (OSError, IOError) as e:
             if e.errno == 16:   # Device or resource busy
                 if _gpio_warnings:
-                    warnings.warn("This channel is already in use, continuing anyway.  Use GPIO.setwarnings(False) to disable warnings.", stacklevel=2)
+                    warnings.warn("Channel {0} is already in use, continuing anyway. Use GPIO.setwarnings(False) to disable warnings.".format(channel), stacklevel=2)
                 sysfs.unexport(pin)
                 sysfs.export(pin)
             else:
@@ -304,7 +414,7 @@ def wait_for_edge(channel, trigger, timeout=-1):
         (:py:attr:`GPIO.BOARD`, :py:attr:`GPIO.BCM` or :py:attr:`GPIO.SUNXI`).
     :param trigger: The event to detect, one of: :py:attr:`GPIO.RISING`,
         :py:attr:`GPIO.FALLING` or :py:attr:`GPIO.BOTH`.
-    :param timeout: TODO
+    :param timeout: (optional) TODO
 
     In other words, the polling example above that waits for a button press
     could be rewritten as:
@@ -336,7 +446,7 @@ def wait_for_edge(channel, trigger, timeout=-1):
         return channel
 
 
-def add_event_detect(channel, trigger, callback=None):
+def add_event_detect(channel, trigger, callback=None, bouncetime=None):
     """
     This function is designed to be used in a loop with other things, but unlike
     polling it is not going to miss the change in state of an input while the
@@ -349,6 +459,7 @@ def add_event_detect(channel, trigger, callback=None):
     :param trigger: The event to detect, one of: :py:attr:`GPIO.RISING`,
         :py:attr:`GPIO.FALLING` or :py:attr:`GPIO.BOTH`.
     :param callback: (optional) TODO
+    :param bouncetime: (optional) TODO
 
     .. code: python
 
@@ -358,15 +469,17 @@ def add_event_detect(channel, trigger, callback=None):
            print('Button pressed')
     """
     _check_configured(channel, direction=IN)
+
+    if bouncetime is not None:
+        if _gpio_warnings:
+            warnings.warn("bouncetime is not (yet) fully supported, continuing anyway. Use GPIO.setwarnings(False) to disable warnings.", stacklevel=2)
+
     pin = get_gpio_pin(_mode, channel)
     event.add_edge_detect(pin, trigger, __wrap(callback, channel))
 
 
 def remove_event_detect(channel):
     """
-    If for some reason, your program no longer wishes to detect edge events,
-    this function will stop and remove the event detection thread.
-
     :param channel: the channel based on the numbering system you have specified
         (:py:attr:`GPIO.BOARD`, :py:attr:`GPIO.BCM` or :py:attr:`GPIO.SUNXI`).
     """
@@ -375,55 +488,40 @@ def remove_event_detect(channel):
     event.remove_edge_detect(pin)
 
 
-def add_event_callback(channel, callback):
+def add_event_callback(channel, callback, bouncetime=None):
     """
-    OPi.GPIO manages a number of secondary threads for callback functions. This
-    means that callback functions can be run at the same time as your main
-    program, in immediate response to an edge.
-
     :param channel: the channel based on the numbering system you have specified
         (:py:attr:`GPIO.BOARD`, :py:attr:`GPIO.BCM` or :py:attr:`GPIO.SUNXI`).
     :param callback: TODO
-
-    For example:
-
-    .. code:: python
-
-       def my_callback(channel):
-           print('This is a edge event callback function!')
-           print('Edge detected on channel %s'%channel)
-           print('This is run in a different thread to your main program')
-
-       GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback)  # add rising edge detection on a channel
-       #...the rest of your program...
-
-    If you wanted more than one callback function:
-
-    .. code:: python
-
-       def my_callback_one(channel):
-           print('Callback one')
-
-       def my_callback_two(channel):
-           print('Callback two')
-
-       GPIO.add_event_detect(channel, GPIO.RISING)
-       GPIO.add_event_callback(channel, my_callback_one)
-       GPIO.add_event_callback(channel, my_callback_two)
-
-    Note that in this case, the callback functions are run sequentially, not
-    concurrently. This is because there is only one thread used for callbacks,
-    in which every callback is run, in the order in which they have been
-    defined.
+    :param bouncetime: (optional) TODO
     """
     _check_configured(channel, direction=IN)
+
+    if bouncetime is not None:
+        if _gpio_warnings:
+            warnings.warn("bouncetime is not (yet) fully supported, continuing anyway. Use GPIO.setwarnings(False) to disable warnings.", stacklevel=2)
+
     pin = get_gpio_pin(_mode, channel)
     event.add_edge_callback(pin, __wrap(callback, channel))
 
 
 def event_detected(channel):
     """
-    TODO
+    This function is designed to be used in a loop with other things, but unlike
+    polling it is not going to miss the change in state of an input while the
+    CPU is busy working on other things. This could be useful when using
+    something like Pygame or PyQt where there is a main loop listening and
+    responding to GUI events in a timely basis.
+
+    .. code:: python
+
+       GPIO.add_event_detect(channel, GPIO.RISING)  # add rising edge detection on a channel
+       do_something()
+       if GPIO.event_detected(channel):
+           print('Button pressed')
+
+    Note that you can detect events for :py:attr:`GPIO.RISING`,
+    :py:attr:`GPIO.FALLING` or :py:attr:`GPIO.BOTH`.
 
     :param channel: the channel based on the numbering system you have specified
         (:py:attr:`GPIO.BOARD`, :py:attr:`GPIO.BCM` or :py:attr:`GPIO.SUNXI`).
