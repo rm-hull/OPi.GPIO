@@ -154,7 +154,7 @@ You may notice that the callbacks are called more than once for each button
 press. This is as a result of what is known as 'switch bounce'. There are two
 ways of dealing with switch bounce:
 
-* add a 0.1uF capacitor across your switch.
+* add a 0.1µF capacitor across your switch.
 * software debouncing
 * a combination of both
 
