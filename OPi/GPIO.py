@@ -251,12 +251,12 @@ def setup(channel, direction, initial=None, pull_up_down=None):
         (:py:attr:`GPIO.BOARD`, :py:attr:`GPIO.BCM` or :py:attr:`GPIO.SUNXI`).
     :param direction: whether to treat the GPIO pin as input or output (use only
         :py:attr:`GPIO.IN` or :py:attr:`GPIO.OUT`).
-    :param initial: When supplied and setting up an output pin, resets the pin
-        to the value given (can be :py:attr:`0` / :py:attr:`GPIO.LOW` /
+    :param initial: (optional) When supplied and setting up an output pin,
+        resets the pin to the value given (can be :py:attr:`0` / :py:attr:`GPIO.LOW` /
         :py:attr:`False` or :py:attr:`1` / :py:attr:`GPIO.HIGH` / :py:attr:`True`).
-    :param pull_up_down: When supplied and setting up an input pin, configures
-        the pin to 3.3V (pull-up) or 0V (pull-down) depending on the value given
-        (can be :py:attr:`GPIO.PUD_OFF` / :py:attr:`GPIO.PUD_UP` /
+    :param pull_up_down: (optional) When supplied and setting up an input pin,
+        configures the pin to 3.3V (pull-up) or 0V (pull-down) depending on the
+        value given (can be :py:attr:`GPIO.PUD_OFF` / :py:attr:`GPIO.PUD_UP` /
         :py:attr:`GPIO.PUD_DOWN`)
 
     To configure a channel as an input:
@@ -367,7 +367,7 @@ def wait_for_edge(channel, trigger, timeout=-1):
         (:py:attr:`GPIO.BOARD`, :py:attr:`GPIO.BCM` or :py:attr:`GPIO.SUNXI`).
     :param trigger: The event to detect, one of: :py:attr:`GPIO.RISING`,
         :py:attr:`GPIO.FALLING` or :py:attr:`GPIO.BOTH`.
-    :param timeout: TODO
+    :param timeout: (optional) TODO
 
     In other words, the polling example above that waits for a button press
     could be rewritten as:
