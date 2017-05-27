@@ -291,7 +291,8 @@ def setup(channel, direction, initial=None, pull_up_down=None):
         raise RuntimeError("Mode has not been set")
 
     if pull_up_down is not None:
-        warnings.warn("OPi.GPIO does not (yet) fully support pull/up settings, continuing anyway.", stacklevel=2)
+        if _gpio_warnings:
+            warnings.warn("Pull up/down setting are not (yet) fully supported, continuing anyway. Use GPIO.setwarnings(False) to disable warnings.", stacklevel=2)
 
     if isinstance(channel, list):
         for ch in channel:
