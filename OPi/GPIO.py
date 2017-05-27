@@ -48,6 +48,33 @@ intensive. The other way of responding to a GPIO input is using 'interrupts'
 (edge detection). An edge is the name of a transition from HIGH to LOW (falling
 edge) or LOW to HIGH (rising edge).
 
+Pull up / Pull down resistors
+-----------------------------
+.. note:: Support for pull up / pull down resistors is not yet complete: if
+   specified, a warning will be displayed instead, so that it is at least
+   compatible with existing code, but without implemening the actual
+   functionality.
+
+If you do not have the input pin connected to anything, it will 'float'. In
+other words, the value that is read in is undefined because it is not connected
+to anything until you press a button or switch. It will probably change value a
+lot as a result of receiving mains interference.
+
+To get round this, we use a pull up or a pull down resistor. In this way, the
+default value of the input can be set. It is possible to have pull up/down
+resistors in hardware and using software. In hardware, a 10K resistor between
+the input channel and 3.3V (pull-up) or 0V (pull-down) is commonly used. The
+OPi.GPIO module allows you to configure the SOC to do this in software:
+
+.. code:: python
+
+   GPIO.setup(channel, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+     # or
+   GPIO.setup(channel, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+(where channel is the channel number based on the numbering system you have
+specified - BOARD, BCM or SUNXI).
+
 Testing inputs (polling)
 ------------------------
 You can take a snapshot of an input at a moment in time:
@@ -187,7 +214,7 @@ def setwarnings(enabled):
     _gpio_warnings = enabled
 
 
-def setup(channel, direction, initial=None):
+def setup(channel, direction, initial=None, pull_up_down=None):
     """
     You need to set up every channel you are using as an input or an output.
 
@@ -198,6 +225,10 @@ def setup(channel, direction, initial=None):
     :param initial: When supplied and setting up an output pin, resets the pin
         to the value given (can be :py:attr:`0` / :py:attr:`GPIO.LOW` /
         :py:attr:`False` or :py:attr:`1` / :py:attr:`GPIO.HIGH` / :py:attr:`True`).
+    :param pull_up_down: When supplied and setting up an input pin, configures
+        the pin to 3.3V (pull-up) or 0V (pull-down) depending on the value given
+        (can be :py:attr:`GPIO.PUD_OFF` / :py:attr:`GPIO.PUD_UP` /
+        :py:attr:`GPIO.PUD_DOWN`)
 
     To configure a channel as an input:
 
@@ -229,6 +260,9 @@ def setup(channel, direction, initial=None):
     """
     if _mode is None:
         raise RuntimeError("Mode has not been set")
+
+    if pull_up_down is not None:
+        warnings.warn("OPi.GPIO does not (yet) fully support pull/up settings, continuing anyway.", stacklevel=2)
 
     if isinstance(channel, list):
         for ch in channel:
