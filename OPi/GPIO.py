@@ -108,6 +108,10 @@ there are two ways to get round this:
 * the :py:func:`event_detected` function
 * a threaded callback function that is run when an edge is detected
 
+.. seealso:: Check the documentation for the :py:func:`add_event_detect` and
+   :py:func:`add_event_callback` methods for further information
+   and examples on how to implement threaded callback handling.
+
 Switch debounce
 ---------------
 .. note:: Support for switch debounce is not yet complete: if specified, a
