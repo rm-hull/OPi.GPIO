@@ -457,7 +457,21 @@ def add_event_callback(channel, callback):
 
 def event_detected(channel):
     """
-    TODO
+    This function is designed to be used in a loop with other things, but unlike
+    polling it is not going to miss the change in state of an input while the
+    CPU is busy working on other things. This could be useful when using
+    something like Pygame or PyQt where there is a main loop listening and
+    responding to GUI events in a timely basis.
+
+    .. code:: python
+
+       GPIO.add_event_detect(channel, GPIO.RISING)  # add rising edge detection on a channel
+       do_something()
+       if GPIO.event_detected(channel):
+           print('Button pressed')
+
+    Note that you can detect events for :py:attr:`GPIO.RISING`,
+    :py:attr:`GPIO.FALLING` or :py:attr:`GPIO.BOTH`.
 
     :param channel: the channel based on the numbering system you have specified
         (:py:attr:`GPIO.BOARD`, :py:attr:`GPIO.BCM` or :py:attr:`GPIO.SUNXI`).
