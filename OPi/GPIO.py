@@ -108,6 +108,35 @@ there are two ways to get round this:
 * the :py:func:`event_detected` function
 * a threaded callback function that is run when an edge is detected
 
+Switch debounce
+---------------
+.. note:: Support for switch debounce is not yet complete: if specified, a
+   warning will be displayed instead, so that it is at least compatible with
+   existing code, but without implemening the actual functionality.
+
+You may notice that the callbacks are called more than once for each button
+press. This is as a result of what is known as 'switch bounce'. There are two
+ways of dealing with switch bounce:
+
+* add a 0.1uF capacitor across your switch.
+* software debouncing
+* a combination of both
+
+To debounce using software, add the bouncetime= parameter to a function where
+you specify a callback function. Bouncetime should be specified in milliseconds.
+For example:
+
+.. code:: python
+
+   # add rising edge detection on a channel, ignoring further edges for 200ms for switch bounce handling
+   GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
+
+or
+
+.. code:: python
+
+   GPIO.add_event_callback(channel, my_callback, bouncetime=200)
+
 Outputs
 -------
 1. First set up OPi.GPIO
@@ -370,7 +399,7 @@ def wait_for_edge(channel, trigger, timeout=-1):
         return channel
 
 
-def add_event_detect(channel, trigger, callback=None):
+def add_event_detect(channel, trigger, callback=None, bouncetime=None):
     """
     This function is designed to be used in a loop with other things, but unlike
     polling it is not going to miss the change in state of an input while the
@@ -383,6 +412,7 @@ def add_event_detect(channel, trigger, callback=None):
     :param trigger: The event to detect, one of: :py:attr:`GPIO.RISING`,
         :py:attr:`GPIO.FALLING` or :py:attr:`GPIO.BOTH`.
     :param callback: (optional) TODO
+    :param bouncetime: (optional) TODO
 
     .. code: python
 
@@ -392,6 +422,11 @@ def add_event_detect(channel, trigger, callback=None):
            print('Button pressed')
     """
     _check_configured(channel, direction=IN)
+
+    if bouncetime is not None:
+        if _gpio_warnings:
+            warnings.warn("bouncetime is not (yet) fully supported, continuing anyway. Use GPIO.setwarnings(False) to disable warnings.", stacklevel=2)
+
     pin = get_gpio_pin(_mode, channel)
     event.add_edge_detect(pin, trigger, __wrap(callback, channel))
 
@@ -409,7 +444,7 @@ def remove_event_detect(channel):
     event.remove_edge_detect(pin)
 
 
-def add_event_callback(channel, callback):
+def add_event_callback(channel, callback, bouncetime=None):
     """
     OPi.GPIO manages a number of secondary threads for callback functions. This
     means that callback functions can be run at the same time as your main
@@ -418,6 +453,7 @@ def add_event_callback(channel, callback):
     :param channel: the channel based on the numbering system you have specified
         (:py:attr:`GPIO.BOARD`, :py:attr:`GPIO.BCM` or :py:attr:`GPIO.SUNXI`).
     :param callback: TODO
+    :param bouncetime: (optional) TODO
 
     For example:
 
@@ -451,6 +487,11 @@ def add_event_callback(channel, callback):
     defined.
     """
     _check_configured(channel, direction=IN)
+
+    if bouncetime is not None:
+        if _gpio_warnings:
+            warnings.warn("bouncetime is not (yet) fully supported, continuing anyway. Use GPIO.setwarnings(False) to disable warnings.", stacklevel=2)
+
     pin = get_gpio_pin(_mode, channel)
     event.add_edge_callback(pin, __wrap(callback, channel))
 
