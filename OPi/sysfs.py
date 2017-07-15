@@ -46,9 +46,9 @@ def input(pin):
 
 
 def output(pin, value):
-    assert value in [HIGH, LOW]
+    str_value = "1" if value else "0"
     with value_descriptor(pin, "w") as fp:
-        fp.write(str(value))
+        fp.write(str_value)
 
 
 def edge(pin, trigger):
