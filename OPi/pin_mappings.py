@@ -67,7 +67,7 @@ _pin_map = {
     SUNXI: _sunXi(),
 
     # User defined, initialized as empty
-    CUSTOM: { }
+    CUSTOM: {}
 }
 
 
