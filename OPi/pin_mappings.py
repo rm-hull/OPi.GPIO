@@ -3,7 +3,8 @@
 # See LICENSE.md for details.
 
 import functools
-from OPi.constants import BOARD, BCM, SUNXI
+from copy import deepcopy
+from OPi.constants import BOARD, BCM, SUNXI, CUSTOM
 
 
 class _sunXi(object):
@@ -63,8 +64,15 @@ _pin_map = {
         27: 0
     },
 
-    SUNXI: _sunXi()
+    SUNXI: _sunXi(),
+
+    # User defined, initialized as empty
+    CUSTOM: { }
 }
+
+
+def set_custom_pin_mappings(mappings):
+    _pin_map[CUSTOM] = deepcopy(mappings)
 
 
 def get_gpio_pin(mode, channel):
@@ -75,3 +83,4 @@ def get_gpio_pin(mode, channel):
 bcm = functools.partial(get_gpio_pin, BCM)
 board = functools.partial(get_gpio_pin, BOARD)
 sunxi = functools.partial(get_gpio_pin, SUNXI)
+custom = functools.partial(get_gpio_pin, CUSTOM)
