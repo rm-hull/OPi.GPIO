@@ -18,7 +18,7 @@ version = read_file("VERSION.txt").strip()
 
 needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
 pytest_runner = ['pytest-runner'] if needs_pytest else []
-test_deps = ["mock", "pytest", "pytest-cov", "pytest-warnings", "pyfakefs"]
+test_deps = ["mock", "pytest", "pytest-cov", "pyfakefs"]
 
 setup(
     name="OPi.GPIO",
