@@ -76,7 +76,7 @@ def set_custom_pin_mappings(mappings):
 
 
 def get_gpio_pin(mode, channel):
-    assert mode in [BOARD, BCM, SUNXI]
+    assert mode in [BOARD, BCM, SUNXI, CUSTOM]
     return _pin_map[mode][channel]
 
 

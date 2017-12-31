@@ -281,7 +281,7 @@ def setmode(mode):
         pin mapping.
     """
 
-    if type(mode) is dict or type(mode) is object:
+    if hasattr(mode, '__getitem__'):
         set_custom_pin_mappings(mode)
         mode = CUSTOM
 

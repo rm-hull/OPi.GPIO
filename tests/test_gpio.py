@@ -293,3 +293,31 @@ def test_callback_wrapper_not_none():
     callback(97)
     assert 17 in called
     assert 97 not in called
+
+
+def test_custom_dict():
+    GPIO.cleanup()
+    assert GPIO.getmode() is None
+    with patch("OPi.GPIO.sysfs") as mock:
+        GPIO.setmode({"A": 5, "B": 37})
+        assert GPIO.getmode() is GPIO.CUSTOM
+        GPIO.setup("A", GPIO.IN)
+        mock.export.assert_called_with(5)
+        mock.direction.assert_called_with(5, GPIO.IN)
+        assert "A" in GPIO._exports
+
+
+def test_custom_object():
+    class mapper(object):
+        def __getitem__(self, value):
+            return value + 4
+
+    GPIO.cleanup()
+    assert GPIO.getmode() is None
+    with patch("OPi.GPIO.sysfs") as mock:
+        GPIO.setmode(mapper())
+        assert GPIO.getmode() is GPIO.CUSTOM
+        GPIO.setup(11, GPIO.IN)
+        mock.export.assert_called_with(15)
+        mock.direction.assert_called_with(15, GPIO.IN)
+        assert 11 in GPIO._exports
