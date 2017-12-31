@@ -27,7 +27,7 @@ def test_mode():
     GPIO.cleanup()
     assert GPIO.getmode() is None
     with pytest.raises(AssertionError):
-        GPIO.setmode("Sausages")
+        GPIO.setmode(54335)
 
 
 def test_warnings():
