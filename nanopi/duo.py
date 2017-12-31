@@ -6,6 +6,13 @@
 Created on Dec 31, 2017
 
 @author: sgoldsmith
+
+Usage:
+
+import nanopi.duo
+from OPi import GPIO
+
+GPIO.setmode(nanopi.duo.BOARD)
 '''
 
 BOARD = {
