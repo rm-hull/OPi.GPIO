@@ -280,7 +280,6 @@ def setmode(mode):
         :py:attr:`GPIO.SUNXI`, or a `dict` or `object` representing a custom
         pin mapping.
     """
-
     if hasattr(mode, '__getitem__'):
         set_custom_pin_mappings(mode)
         mode = CUSTOM
