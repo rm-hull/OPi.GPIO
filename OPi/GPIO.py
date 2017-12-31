@@ -243,8 +243,8 @@ import warnings
 from OPi.constants import IN, OUT
 from OPi.constants import LOW, HIGH                     # noqa: F401
 from OPi.constants import NONE, RISING, FALLING, BOTH   # noqa: F401
-from OPi.constants import BCM, BOARD, SUNXI
-from OPi.pin_mappings import get_gpio_pin
+from OPi.constants import BCM, BOARD, SUNXI, CUSTOM
+from OPi.pin_mappings import get_gpio_pin, set_custom_pin_mappings
 from OPi import event, sysfs
 
 _gpio_warnings = True
@@ -276,10 +276,15 @@ def setmode(mode):
     """
     You must call this method prior to using all other calls.
 
-    :param mode: the mode, one of :py:attr:`GPIO.BOARD`, :py:attr:`GPIO.BCM` or
-        :py:attr:`GPIO.SUNXI` only.
+    :param mode: the mode, one of :py:attr:`GPIO.BOARD`, :py:attr:`GPIO.BCM`,
+        :py:attr:`GPIO.SUNXI`, or a `dict` or `object` representing a custom
+        pin mapping.
     """
-    assert mode in [BCM, BOARD, SUNXI]
+    if hasattr(mode, '__getitem__'):
+        set_custom_pin_mappings(mode)
+        mode = CUSTOM
+
+    assert mode in [BCM, BOARD, SUNXI, CUSTOM]
     global _mode
     _mode = mode
 

@@ -7,7 +7,7 @@
 Tests for the :py:mod:`OPi.pin_mappings` module.
 """
 
-from OPi.pin_mappings import bcm, board, sunxi
+from OPi.pin_mappings import bcm, board, sunxi, custom, set_custom_pin_mappings
 
 
 def test_mappings():
@@ -28,3 +28,22 @@ def test_mappings():
     assert bcm(25) == board(22) == sunxi("PA02") == 2
     assert bcm(8) == board(24) == sunxi("PA13") == 13
     assert bcm(7) == board(26) == sunxi("PA10") == 10
+
+
+def test_custom_dict():
+    set_custom_pin_mappings({1: 2, 2: 3, 3: 4})
+    assert custom(1) == 2
+    assert custom(2) == 3
+    assert custom(3) == 4
+
+
+def test_custom_object():
+
+    class mapper(object):
+        def __getitem__(self, value):
+            return value + 4
+
+    set_custom_pin_mappings(mapper())
+    assert custom(1) == 5
+    assert custom(2) == 6
+    assert custom(3) == 7

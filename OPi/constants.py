@@ -34,6 +34,7 @@ GPIO.PUD_UP = 2
 GPIO.BOARD = 10
 GPIO.BCM = 11
 GPIO.SUNXI = 12  # made up :]
+GPIO.CUSTOM = 13  # also made up 8]
 
 GPIO.NONE = 0
 GPIO.RISING = 1
