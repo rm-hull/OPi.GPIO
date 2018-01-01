@@ -16,7 +16,7 @@ OPi.GPIO
 .. image:: https://img.shields.io/pypi/v/OPi.GPIO.svg
    :target: https://pypi.python.org/pypi/OPi.GPIO
    
-.. image:: https://img.shields.io/maintenance/yes/2017.svg?maxAge=2592000
+.. image:: https://img.shields.io/maintenance/yes/2018.svg?maxAge=2592000
 
 A drop-in replacement library for `RPi.GPIO <https://sourceforge.net/projects/raspberry-gpio-python/>`_
 for the Orange Pi Zero. Only the basic GPIO functions are replicated,
@@ -39,7 +39,7 @@ License
 -------
 The MIT License
 
-Copyright (c) 2017 Richard Hull
+Copyright (c) 2018 Richard Hull
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
