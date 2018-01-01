@@ -15,3 +15,4 @@ The source code is available to clone at: https://github.com/rm-hull/OPi.GPIO
 Contributors
 ^^^^^^^^^^^^
 * Simon Rowe (@srowe)
+* Steven P. Goldsmith (@sgjava)
