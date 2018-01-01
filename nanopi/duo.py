@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2017 Richard Hull
+# Copyright (c) 2018 Richard Hull & Contributors
 # See LICENSE.md for details.
 
-'''
-Created on Dec 31, 2017
-
-@author: sgoldsmith
+"""
+Alternative pin mappings for NanoPi DUO board with/without Mini Shield (see
+http://wiki.friendlyarm.com/wiki/index.php/NanoPi_Duo#Layout)
 
 Usage:
 
-import nanopi.duo
-from OPi import GPIO
+.. code:: python
+   import nanopi.duo
+   from OPi import GPIO
 
-GPIO.setmode(nanopi.duo.BOARD)
-'''
+   GPIO.setmode(nanopi.duo.BOARD)   
+"""
 
 BOARD = {
     3: 12, # I2C0_SDA/GPIOA12
