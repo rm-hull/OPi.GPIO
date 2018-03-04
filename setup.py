@@ -31,7 +31,7 @@ setup(
     keywords="orange pi opi gpio",
     url="https://github.com/rm-hull/OPi.GPIO",
     download_url="https://github.com/rm-hull/OPi.GPIO/tarball/" + version,
-    packages=["OPi", "nanopi"],
+    packages=["OPi", "nanopi", "orangepi"],
     setup_requires=pytest_runner,
     tests_require=test_deps,
     extras_require={
