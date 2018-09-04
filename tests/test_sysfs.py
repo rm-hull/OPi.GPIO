@@ -7,10 +7,25 @@
 Tests for the :py:mod:`OPi.sysfs` module.
 """
 import pytest
+import time
+import threading
+import os
 
-from OPi.sysfs import export, unexport, direction, input, output, edge
-from OPi.constants import IN, OUT, LOW, HIGH, NONE, RISING, FALLING, BOTH
+from OPi.sysfs import export, unexport, direction, input, output, edge, WAIT_PERMISSION_TIMOUT
+from OPi.constants import IN, OUT, LOW, HIGH, NONE, RISING, FALLING, BOTH\
 
+@pytest.mark.parametrize("test_input,expected", [
+    (0.1, True),
+    (1.5, False),
+])
+def test_await_permissions(fs, test_input, expected):
+    path = "sys/class/gpio/test"
+    fs.CreateFile(path)
+    os.chmod(path, 0o444) # revoke write permissions to the file
+    start_time = time.time()
+    threading.Timer(test_input, lambda: os.chmod(0o666)).start() #give write permission back 
+    await_permissions(path)
+    assert (time.time() - start_time < WAIT_PERMISSION_TIMEOUT) == expected
 
 def test_export(fs):
     fs.CreateFile("/sys/class/gpio/export")
