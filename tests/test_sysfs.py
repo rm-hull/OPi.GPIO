@@ -19,11 +19,11 @@ from OPi.constants import IN, OUT, LOW, HIGH, NONE, RISING, FALLING, BOTH\
     (1.5, False),
 ])
 def test_await_permissions(fs, test_input, expected):
-    path = "sys/class/gpio/test"
+    path = "/sys/class/gpio/test"
     fs.CreateFile(path)
     os.chmod(path, 0o444) # revoke write permissions to the file
     start_time = time.time()
-    threading.Timer(test_input, lambda: os.chmod(0o666)).start() #give write permission back 
+    threading.Timer(test_input, lambda: os.chmod(path, 0o666)).start() #give write permission back 
     await_permissions(path)
     assert (time.time() - start_time < WAIT_PERMISSION_TIMEOUT) == expected
 
