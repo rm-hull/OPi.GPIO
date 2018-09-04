@@ -9,13 +9,16 @@ from OPi.constants import HIGH, LOW, IN, OUT, \
 import os
 import time
 
-# Allow to wait up to 1 second for the file have the correct permissions 
+# Allow to wait up to 1 second for the file have the correct permissions
 WAIT_PERMISSION_TIMEOUT = 1.
 
+
 def await_permissions(path):
-    start_time = time.time() 
-    while not os.access(path, os.W_OK) and time.time() - start_time < WAIT_PERMISSION_TIMEOUT: 
-        time.sleep(0.1) 
+    start_time = time.time()
+    while (not os.access(path, os.W_OK) and
+            time.time() - start_time < WAIT_PERMISSION_TIMEOUT):
+        time.sleep(0.1)
+
 
 @contextmanager
 def value_descriptor(pin, mode="r"):
