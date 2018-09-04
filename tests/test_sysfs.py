@@ -11,8 +11,10 @@ import time
 import threading
 import os
 
-from OPi.sysfs import export, unexport, direction, input, output, edge, await_permissions, WAIT_PERMISSION_TIMEOUT
-from OPi.constants import IN, OUT, LOW, HIGH, NONE, RISING, FALLING, BOTH\
+from OPi.sysfs import export, unexport, direction, input, output,\
+    edge, await_permissions, WAIT_PERMISSION_TIMEOUT
+from OPi.constants import IN, OUT, LOW, HIGH, NONE, RISING, FALLING, BOTH
+
 
 @pytest.mark.parametrize("test_input,expected", [
     (0.1, True),
@@ -21,11 +23,12 @@ from OPi.constants import IN, OUT, LOW, HIGH, NONE, RISING, FALLING, BOTH\
 def test_await_permissions(fs, test_input, expected):
     path = "/sys/class/gpio/test"
     fs.CreateFile(path)
-    os.chmod(path, 0o444) # revoke write permissions to the file
+    os.chmod(path, 0o444)  # revoke write permissions to the file
     start_time = time.time()
-    threading.Timer(test_input, lambda: os.chmod(path, 0o666)).start() #give write permission back 
+    threading.Timer(test_input, lambda: os.chmod(path, 0o666)).start()
     await_permissions(path)
     assert (time.time() - start_time < WAIT_PERMISSION_TIMEOUT) == expected
+
 
 def test_export(fs):
     fs.CreateFile("/sys/class/gpio/export")
