@@ -17,3 +17,4 @@ Contributors
 * Simon Rowe (@srowe)
 * Steven P. Goldsmith (@sgjava)
 * Adrian Cuzman (@adriancuzman)
+* Mathieu Pasquet (@winterscar)
