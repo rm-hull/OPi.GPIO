@@ -20,10 +20,10 @@ Usage:
 
 # NanoPi NEO Core2 physical board pin to GPIO pin
 BOARD = {
-     3:  12,    # PA12/TWI0_SDA/DI_RX/PA_EINT12
-     5:  11,    # PA11/TWI0_SCK/DI_TX/PA_EINT11
-     7: 203,    # PG11/PCM1_CLK/PG_EINT11
-     8: 198,    # PG6/UART1_TX/PG_EINT6
+    3:   12,    # PA12/TWI0_SDA/DI_RX/PA_EINT12
+    5:   11,    # PA11/TWI0_SCK/DI_TX/PA_EINT11
+    7:  203,    # PG11/PCM1_CLK/PG_EINT11
+    8:  198,    # PG6/UART1_TX/PG_EINT6
     10: 199,    # PG7/UART1_RX/PG_EINT7
     11:   0,    # PA0/UART2_TX/JTAG_MS0/PA_EINT0
     12:   6,    # PA6/SIM_PWREN/PWM1/PA_EINT6
@@ -40,11 +40,11 @@ BOARD = {
 
 # NanoPi NEO Core2 BCM pin to actual GPIO pin
 BCM = {
-     2:  12,    # PA12/TWI0_SDA/DI_RX/PA_EINT12
-     3:  11,    # PA11/TWI0_SCK/DI_TX/PA_EINT11
-     4: 203,    # PG11/PCM1_CLK/PG_EINT11
-     8:  67,    # PC3/NAND_CE1/SPI0_CS
-     9:  65,    # PC1/NAND_ALE/SPI0_MISO
+    2:   12,    # PA12/TWI0_SDA/DI_RX/PA_EINT12
+    3:   11,    # PA11/TWI0_SCK/DI_TX/PA_EINT11
+    4:  203,    # PG11/PCM1_CLK/PG_EINT11
+    8:   67,    # PC3/NAND_CE1/SPI0_CS
+    9:   65,    # PC1/NAND_ALE/SPI0_MISO
     10:  64,    # PC0/NAND_WE/SPI0_MOSI
     11:  66,    # PC2/NAND_CLE/SPI0_CLK
     14: 198,    # PG6/UART1_TX/PG_EINT6
@@ -57,4 +57,3 @@ BCM = {
     25:   1,    # PA1/UART2_RX/JTAG_CK0/PA_EINT1
     27:   2     # PA2/UART2_RTS/JTAG_DO0/PA_EINT2
 }
-

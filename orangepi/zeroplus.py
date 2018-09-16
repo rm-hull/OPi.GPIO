@@ -20,10 +20,10 @@ Usage:
 
 # Orange Pi Zero Plus physical board pin to GPIO pin
 BOARD = {
-     3:  12,    # PA12/TWI0_SDA/DI_RX/PA_EINT12
-     5:  11,    # PA11/TWI0_SCK/DI_TX/PA_EINT11
-     7:   6,    # PA6/SIM_PWREN/PWM1/PA_EINT6
-     8: 198,    # PG6/UART1_TX/PG_EINT6
+    3:   12,    # PA12/TWI0_SDA/DI_RX/PA_EINT12
+    5:   11,    # PA11/TWI0_SCK/DI_TX/PA_EINT11
+    7:    6,    # PA6/SIM_PWREN/PWM1/PA_EINT6
+    8:  198,    # PG6/UART1_TX/PG_EINT6
     10: 199,    # PG7/UART1_RX/PG_EINT7
     11:   1,    # PA1/UART2_RX/JTAG_CK/PA_EINT1
     12:   7,    # PA7/SIM_CLK/PA_EINT7
@@ -41,12 +41,12 @@ BOARD = {
 
 # Orange Pi Zero Plus BCM pin to actual GPIO pin
 BCM = {
-     2:  12,    # PA12/TWI0_SDA/DI_RX/PA_EINT12
-     3:  11,    # PA11/TWI0_SCK/DI_TX/PA_EINT11
-     4:   6,    # PA6/SIM_PWREN/PWM1/PA_EINT6
-     7:  10,    # PA10/SIM_DET/PA_EINT10
-     8:  13,    # PA13/SPI1_CS/UART3_TX/PA_EINT13
-     9:  16,    # PA16/SPI1_MISO/UART3_CTS/PA_EINT16
+    2:   12,    # PA12/TWI0_SDA/DI_RX/PA_EINT12
+    3:   11,    # PA11/TWI0_SCK/DI_TX/PA_EINT11
+    4:    6,    # PA6/SIM_PWREN/PWM1/PA_EINT6
+    7:   10,    # PA10/SIM_DET/PA_EINT10
+    8:   13,    # PA13/SPI1_CS/UART3_TX/PA_EINT13
+    9:   16,    # PA16/SPI1_MISO/UART3_CTS/PA_EINT16
     10:  15,    # PA15/SPI1_MOSI/UART3_RTS/PA_EINT15
     11:  14,    # PA14/SPI1_CLK/UART3_RX/PA_EINT14
     14: 198,    # PG6/UART1_TX/PG_EINT6
@@ -59,4 +59,3 @@ BCM = {
     25:   2,    # PA2/UART2_RTS/JTAG_DO/PA_EINT2
     27:   0     # PA0/UART2_TX/JTAG_MS0/PA_EINT0
 }
-
