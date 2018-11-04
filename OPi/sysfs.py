@@ -15,8 +15,11 @@ WAIT_PERMISSION_TIMEOUT = 1.
 
 def await_permissions(path):
     start_time = time.time()
-    while (not os.access(path, os.W_OK) and
-            time.time() - start_time < WAIT_PERMISSION_TIMEOUT):
+
+    def timed_out():
+        return time.time() - start_time >= WAIT_PERMISSION_TIMEOUT
+
+    while (not os.access(path, os.W_OK) and not timed_out()):
         time.sleep(0.1)
 
 
