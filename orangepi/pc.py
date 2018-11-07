@@ -22,6 +22,7 @@ BOARD = {
     10: 14,   # PA14 (SPI1_CLK/UART3_RX/PA_EINT14)
     11: 1,    # PA1 (UART2_RX/JTAG_CK/PA_EINT1)
     12: 110,  # PD14
+    13: 0,    #	PA0 (UART2_TX/JTAG_MS/PA_EINT0)
     15: 3,    # PA3 (UART2_CTS/JTAG_DI/PA_EINT3)
     16: 68,   # PC4
     18: 71,   # PC7
@@ -53,6 +54,7 @@ BCM = {
     10: 14,   # PA14 (SPI1_CLK/UART3_RX/PA_EINT14)
     11: 1,    # PA1 (UART2_RX/JTAG_CK/PA_EINT1)
     12: 110,  # PD14
+    13: 0,    #	PA0 (UART2_TX/JTAG_MS/PA_EINT0)
     15: 3,    # PA3 (UART2_CTS/JTAG_DI/PA_EINT3)
     16: 68,   # PC4
     18: 71,   # PC7
