@@ -19,3 +19,4 @@ Contributors
 * Adrian Cuzman (@adriancuzman)
 * Mathieu Pasquet (@winterscar)
 * @5kft
+* Stephen Sorriaux (@StephenSorriaux)
