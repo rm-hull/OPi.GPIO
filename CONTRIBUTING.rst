@@ -20,4 +20,4 @@ Contributors
 * Mathieu Pasquet (@winterscar)
 * @5kft
 * Stephen Sorriaux (@StephenSorriaux)
-* ichael Still (@mikalstill)
+* Michael Still (@mikalstill)
