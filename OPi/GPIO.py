@@ -244,6 +244,7 @@ from OPi.constants import IN, OUT
 from OPi.constants import LOW, HIGH                     # noqa: F401
 from OPi.constants import NONE, RISING, FALLING, BOTH   # noqa: F401
 from OPi.constants import BCM, BOARD, SUNXI, CUSTOM
+from OPi.constants import PUD_UP, PUD_DOWN, PUD_OFF     # noqa: F401
 from OPi.pin_mappings import get_gpio_pin, set_custom_pin_mappings
 from OPi import event, sysfs
 
