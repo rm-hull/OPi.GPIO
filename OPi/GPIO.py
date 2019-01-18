@@ -238,6 +238,7 @@ Methods
 -------
 """
 
+import os
 import warnings
 
 from OPi.constants import IN, OUT
@@ -261,6 +262,23 @@ def _check_configured(channel, direction=None):
     if direction is not None and direction != configured:
         descr = "input" if configured == IN else "output"
         raise RuntimeError("Channel {0} is configured for {1}".format(channel, descr))
+
+
+class PinDoesNotSupportEdgeDetection(Exception):
+    pass
+
+
+def _pin_has_interrupt(pin):
+    path = "/sys/class/gpio/gpio{0}/edge".format(pin)
+    sysfs.await_permissions(path)
+
+    if not os.access(path, os.W_OK):
+        # A failure here indicates that the GPIO pin in question does not
+        # have an interrupt, and therefore cannot do edge detection. An
+        # example is GPIO PC5 on an OrangePi Prime.
+        raise PinDoesNotSupportEdgeDetection(
+            "Unfortunately pin {0} does not support edge "
+            "detection.".format(pin))
 
 
 def getmode():
@@ -481,6 +499,7 @@ def add_event_detect(channel, trigger, callback=None, bouncetime=None):
             warnings.warn("bouncetime is not (yet) fully supported, continuing anyway. Use GPIO.setwarnings(False) to disable warnings.", stacklevel=2)
 
     pin = get_gpio_pin(_mode, channel)
+    _pin_has_interrupt(pin)
     event.add_edge_detect(pin, trigger, __wrap(callback, channel))
 
 
