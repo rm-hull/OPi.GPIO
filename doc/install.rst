@@ -21,14 +21,13 @@ This can be accomplished as follows:
 
 That should add your user to the GPIO group, create a new ``UDEV`` rule, and open it in the Nano text editor. 
 
-Enter the following into Nano
+Enter the following into Nano:
 
+.. code-block:: text
 
    SUBSYSTEM=="gpio", KERNEL=="gpiochip*", ACTION=="add", PROGRAM="/bin/sh -c 'chown root:gpio /sys/class/gpio/export /sys/class/gpio/unexport ; chmod 220 /sys/class/gpio/export /sys/class/gpio/unexport'" 
    SUBSYSTEM=="gpio", KERNEL=="gpio*", ACTION=="add", PROGRAM="/bin/sh -c 'chown root:gpio /sys%p/active_low /sys%p/direction /sys%p/edge /sys%p/value ; chmod 660 /sys%p/active_low /sys%p/direction /sys%p/edge /sys%p/value'"
 
-
-
-press ``ctrl-x``, ``Y``, and ``ENTER`` to save and close the file. 
+Press ``ctrl-x``, ``Y``, and ``ENTER`` to save and close the file. 
 
 Finally, reboot and you should be ready to use ``OPi.GPIO`` as a non root user. 
