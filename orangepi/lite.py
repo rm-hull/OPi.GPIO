@@ -20,8 +20,8 @@ Usage:
 
 import orangepi.pc
 
-# Orange Pi One physical board pin to GPIO pin
+# Orange Pi Lite physical board pin to GPIO pin
 BOARD = orangepi.pc.BOARD
 
-# Orange Pi One BCM pin to actual GPIO pin
+# Orange Pi Lite BCM pin to actual GPIO pin
 BCM = orangepi.pc.BCM
