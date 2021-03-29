@@ -582,3 +582,104 @@ def cleanup(channel=None):
         event.cleanup(pin)
         sysfs.unexport(pin)
         del _exports[channel]
+
+_exports_pwm = {}
+
+class PWM:
+    
+    #To Do:
+    # 1. Start tracking pwm cases to _exports_pwm
+    # 2. find way to check _exports against _exports_pwm to make sure there is no overlap. Dont think it is a problem for OPi pc+ but better futureproof  
+    
+    def __init__(self, channel, frequency, duty_cycle_percent, invert_polarity = False): #(pwm pin, frequency in KHz)
+        
+        if _mode is None:
+            raise RuntimeError("Mode has not been set")
+        
+        if channel in _exports: #check if there the pin is already assigned
+            raise RuntimeError("Channel {0} is already configured".format(channel))
+        
+        #if channel in _exports_pwm:
+        #    raise RuntimeError("Channel {0} is already configured as PWM pin".format(channel))
+        #else:
+        #    add channel to channel tracker
+        
+        #pin = get_gpio_pin(_mode, channel) #think needs to be changed 
+        pin = channel
+        self.pin = pin
+        self.frequency = frequency
+        self.duty_cycle_percent = duty_cycle_percent
+        self.invert_polarity = invert_polarity
+        
+        try:
+            sysfs.PWM_Export(pin) #creates the pwm sysfs object
+            if invert_polarity is True:
+                sysfs.PWM_Polarity(pin, invert = True) # invert pwm i.e the duty cycle tells you how long the cycle is off 
+            else:
+                sysfs.PWM_Polarity(pin, invert = False) #don't invert the pwm signal. This is the normal way its used.
+            sysfs.PWM_Enable(pin)
+            return sysfs.PWM_Frequency(pin, frequency)
+            
+        except (OSError, IOError) as e:
+            if e.errno == 16:   # Device or resource busy
+                if _gpio_warnings:
+                    warnings.warn("Channel {0} is already in use, continuing anyway. Use GPIO.setwarnings(False) to disable warnings.".format(channel), stacklevel=2)
+                #sysfs.unexport(pin) #leaving this here as a reminder to make a check. There will now be 2 types of pins that can be exported  
+                #sysfs.export(pin)
+                sysfs.PWM_Unexport(pin)
+                sysfs.PWM_Export(pin)
+            else:
+                raise e
+                 
+    def start_pwm(self): #turn on pwm by setting the duty cycle to what the user specified  
+        return sysfs.PWM_Duty_Cycle_Percent(self.pin, self.duty_cycle_percent) #duty cycle controls the on-off
+        
+    def stop_pwm(self): #turn on pwm by setting the duty cycle to 0
+        return sysfs.PWM_Duty_Cycle_Percent(self.pin, 0) #duty cycle at 0 is the equivilant of off
+        
+    def change_frequency(self, new_frequency):
+        # Order of opperations:
+        # 1. convert to period
+        # 1. check if period is increasing or decreasing
+        # 2. If increasing update pwm period and then update the duty cycle period
+        # 3. If decreasing update the duty cycle period and then the pwm period
+        # Why:
+        # The sysfs rule for PWM is that PWM Period >= duty cycle period (in nanosecs)
+        
+        pwm_period = (1/new_frequency)*1e9
+        pwm_period = int(round(pwm_period, 0))
+        duty_cycle = (self.duty_cycle_percent/100)*pwm_period
+        duty_cycle = int(round(duty_cycle, 0)) 
+
+        old_pwm_period = int(round((1/self.frequency)*1e9, 0))
+
+        if (pwm_period > old_pwm_period): #if increasing
+            #update pwm freq
+            sysfs.PWM_Period(self.pin, pwm_period) #update the frequency
+            #update duty cycle
+            sysfs.PWM_Duty_Cycle(self.pin, duty_cycle)
+            
+        else:
+            #update duty cycle
+            sysfs.PWM_Duty_Cycle(self.pin, duty_cycle)
+            #update pwm freq
+            sysfs.PWM_Period(self.pin, pwm_period)
+            
+        self.frequency = new_frequency #update the frequency
+        
+    def duty_cycle(self, duty_cycle_percent): # in percentage (0-100)
+        try:
+            if (0 <= duty_cycle_percent <= 100):
+                self.duty_cycle_percent = duty_cycle_percent
+                return sysfs.PWM_Duty_Cycle_Percent(self.pin, self.duty_cycle_percent) 
+        except:
+            print("error please enter a value between 0 and 100")
+               
+    def pwm_polarity(self): #invert the polarity of the pwm 
+        sysfs.PWM_Disable(self.pin)
+        sysfs.PWM_Polarity(self.pin, invert = not(self.invert_polarity))
+        sysfs.PWM_Enable(self.pin)
+
+    def pwm_close(self):
+        sysfs.PWM_Unexport(self.pin)
+        
