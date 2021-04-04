@@ -792,7 +792,7 @@ class PWM:
 
         :param duty_cycle_percent: the new PWM duty cycle as a percentage.
         """
-        
+
         if (0 <= duty_cycle_percent <= 100):
             self.duty_cycle_percent = duty_cycle_percent
             return sysfs.PWM_Duty_Cycle_Percent(self.chip, self.pin, self.duty_cycle_percent)
