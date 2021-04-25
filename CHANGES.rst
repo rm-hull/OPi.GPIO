@@ -4,6 +4,12 @@ ChangeLog
 +------------+---------------------------------------------------------------------+------------+
 | Version    | Description                                                         | Date       |
 +============+=====================================================================+============+
+| **0.5.0**  | *  Added Hardware PWM Control                                       | 2021/04/25 |
+|            | * Add support for the NanoPi M4 family                              |            |
+|            | * Add pin mapping for orange pi 4 & 4B models                       |            |
+|            | * Add rockpi/rockpi s packages added                                |            |
+|            | * Fix OrangePi PC BCM Pin map                                       |            |
++------------+---------------------------------------------------------------------+------------+
 | **0.4.0**  | * Added various new pin mappings for Orange Pi variants             | 2019/10/21 |
 +------------+---------------------------------------------------------------------+------------+
 | **0.3.6**  | * Expose pullup resistor constants to API users                     | 2019/01/14 |
