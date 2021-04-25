@@ -34,6 +34,7 @@ References
 * https://jsfiddle.net/tuav7f6q/2/
 * https://www.mysensors.org/build/orange
 * https://kaspars.net/blog/linux/orange-pi-zero-gpio
+* https://developer.toradex.com/knowledge-base/pwm-linux
 
 License
 -------

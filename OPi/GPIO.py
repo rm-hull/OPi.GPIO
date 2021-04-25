@@ -234,6 +234,121 @@ the :py:meth:`input()` function. For example to toggle an output:
 
        GPIO.output(12, not GPIO.input(12))
 
+
+PWM
+----
+The PWM module is a hardware PWM feature, meaning that it uses the built in PWM chip
+on the single board computer rather than any software timings or threads, this should
+result in more accurate PWM signal that is less resorce taxing.
+
+PWM is created in the form of an object.
+
+1. First set up OPi.GPIO and create the object
+
+    .. code:: python
+
+       import OPi.GPIO as GPIO
+       PWM_Class = GPIO.PWM(PWM_chip, PWM_pin, frequency_Hz, Duty_Cycle_Percent)
+
+    Note currently you do not need to specify setmode before creating the class as for a GPIO
+    only the PWM_chip number and the PWM_pin.
+    The reson for this and how to find what they are is explained in the sysfs PWM section.
+
+2. Begin the PWM cycle
+
+    .. code:: python
+
+        PWM_Class.start_pwm()
+
+3. Change PWM duty Cycle
+
+    .. code:: python
+        PWM_Class.duty_cycle(50)
+
+    Note this changes the Duty cycle to 50%
+
+4. Change the frequency
+
+    .. code:: python
+        PWM_Class.change_frequency(500)
+
+    Note this changes the Frequency to 500Hz
+
+5. Stop the PWM device
+
+    .. code:: python
+        PWM_Class.stop_pwm()
+
+    Note this stops the signal by setting the duty cycle to 0%
+
+6. Change the Polarity of the signal
+
+    .. code:: python
+        PWM_Class.pwm_polarity()
+
+    Note this changes swaps the on-off times. For example a duty cycle set to 75% before
+    this will result in the signal being on 75% and off 25% of the time. After this is
+    called it would be on 25% and off 75%.
+
+7. Remove PWM Object
+
+    .. code:: python
+        PWM_Class.pwm_close()
+
+SYSFS PWM:
+----------
+The PWM module uses the linux sysfs system to access and control the PWM chip on the single
+board computer. More information can be found at:
+
+https://developer.toradex.com/knowledge-base/pwm-linux
+
+This code was written on an OrangePi PC+ so the following examples are based on that, however any single board
+computer running linux that has a pwm chip will be able to use this.
+To create a PWM object you write 0 to the file '/sys/class/pwm/pwmchip0/export'.
+By writing 0 you are creating a pwm object called pwm0 that is tied to pwm pin 0.
+This pin is RX pin of the DEBUG TTL UART pins (the middle pin of the pins between the power socket and HDMI).
+The PWM commands are then controlled by writing into the files made at '/sys/class/pwm/pwmchip0/pwm0'.
+
+Different single board computers may have pwm chip and pin names, currently the PWM pins have not been
+mapped accross different boards, hence the need to specify the chip number and pin number at the start.
+To find out what pins are available on your device you can follow the following steps:
+
+1. Switch to Super User:
+
+    .. code:: bash
+        su root
+
+2. List all pwm chips on the system:
+
+    .. code:: bash
+        ls -l /sys/class/pwm/
+
+This will show all of the pwm chips on the system for example pwmchip0. The number following pwmchip is the
+chip number used in PWM_chip. Some boards may have multiple chips, they will all be listed with that previous command.
+
+3. Find the pin(s) associated with the chip:
+
+    .. code:: bash
+        echo 0 > /sys/class/pwm/pwmchip0/export
+
+This writes '0' to the file 'export' which is under pwmchip0. If the chip has a pin 0 associated with it, an object that will
+be created that can control the pwm pin. If a pin doesn't exisit an error will come up stating 'no such device'.
+As of yet I do not know how to list out all of the available pins associated with a chip, there is a list at https://linux-sunxi.org/PIO
+however not all pwm pins listed might be readily usable. For example on the OPi PC+ GPIO PA5 (physical pin 7) is listed as being PWM1 however it
+is not accessable by default, likely it is reserved for something else and would probably require changing the DTC file before it can be accessed.
+
+The best option would be to increase the number until you find a pin. You shouldn't need to go higher than 5 for any 1 chip.
+The PWM pins dont follow the GPIO numbering system so the number are quite low.
+
+4. List the created pwm pins:
+
+    .. code:: bash
+        ls /sys/class/pwm/pwmchip0
+
+This lists all the files associated with pwmchip0. if you successfully created an object in step 3 you will see a pwm object (for example pwm0).
+The number listed after pwm is the pin number used in PWM_pin.
+
+
 Methods
 -------
 """
@@ -582,3 +697,118 @@ def cleanup(channel=None):
         event.cleanup(pin)
         sysfs.unexport(pin)
         del _exports[channel]
+
+
+class PWM:
+
+    # To Do:
+    # 1. Start tracking pwm cases to  list like _exports say _exports_pwm
+    # 2. find way to check _exports against _exports_pwm to make sure there is no overlap.
+    # 3. Create map of pwm pins to various boards.
+
+    def __init__(self, chip, pin, frequency, duty_cycle_percent, invert_polarity=False):  # (pwm pin, frequency in KHz)
+
+        """
+        Setup the PWM object to control.
+
+        :param chip: the pwm chip number you wish to use.
+        :param pin: the pwm pin number you wish to use.
+        :param frequency: the frequency of the pwm signal in hertz.
+        :param duty_cycle_percent: the duty cycle percentage.
+        :param invert_polarity: invert the duty cycle.
+            (:py:attr:`True` or :py:attr:`False`).
+        """
+
+        self.chip = chip
+        self.pin = pin
+        self.frequency = frequency
+        self.duty_cycle_percent = duty_cycle_percent
+        self.invert_polarity = invert_polarity
+
+        try:
+            sysfs.PWM_Export(chip, pin)  # creates the pwm sysfs object
+            if invert_polarity is True:
+                sysfs.PWM_Polarity(chip, pin, invert=True)  # invert pwm i.e the duty cycle tells you how long the cycle is off
+            else:
+                sysfs.PWM_Polarity(chip, pin, invert=False)  # don't invert the pwm signal. This is the normal way its used.
+            sysfs.PWM_Enable(chip, pin)
+            return sysfs.PWM_Frequency(chip, pin, frequency)
+
+        except (OSError, IOError) as e:
+            if e.errno == 16:   # Device or resource busy
+                warnings.warn("Pin {0} is already in use, continuing anyway.".format(pin), stacklevel=2)
+                sysfs.PWM_Unexport(chip, pin)
+                sysfs.PWM_Export(chip, pin)
+            else:
+                raise e
+
+    def start_pwm(self):  # turn on pwm by setting the duty cycle to what the user specified
+        """
+        Start PWM Signal.
+        """
+        return sysfs.PWM_Duty_Cycle_Percent(self.chip, self.pin, self.duty_cycle_percent)  # duty cycle controls the on-off
+
+    def stop_pwm(self):  # turn on pwm by setting the duty cycle to 0
+        """
+        Stop PWM Signal.
+        """
+        return sysfs.PWM_Duty_Cycle_Percent(self.chip, self.pin, 0)  # duty cycle at 0 is the equivilant of off
+
+    def change_frequency(self, new_frequency):
+        # Order of opperations:
+        # 1. convert to period
+        # 2. check if period is increasing or decreasing
+        # 3. If increasing update pwm period and then update the duty cycle period
+        # 4. If decreasing update the duty cycle period and then the pwm period
+        # Why:
+        # The sysfs rule for PWM is that PWM Period >= duty cycle period (in nanosecs)
+
+        """
+        Change the frequency of the signal.
+
+        :param new_frequency: the new PWM frequency.
+        """
+
+        pwm_period = (1 / new_frequency) * 1e9
+        pwm_period = int(round(pwm_period, 0))
+        duty_cycle = (self.duty_cycle_percent / 100) * pwm_period
+        duty_cycle = int(round(duty_cycle, 0))
+
+        old_pwm_period = int(round((1 / self.frequency) * 1e9, 0))
+
+        if (pwm_period > old_pwm_period):  # if increasing
+            sysfs.PWM_Period(self.chip, self.pin, pwm_period)  # update the pwm period
+            sysfs.PWM_Duty_Cycle(self.chip, self.pin, duty_cycle)  # update duty cycle
+
+        else:
+            sysfs.PWM_Duty_Cycle(self.chip, self.pin, duty_cycle)  # update duty cycle
+            sysfs.PWM_Period(self.chip, self.pin, pwm_period)  # update pwm freq
+
+        self.frequency = new_frequency  # update the frequency
+
+    def duty_cycle(self, duty_cycle_percent):  # in percentage (0-100)
+        """
+        Change the duty cycle of the signal.
+
+        :param duty_cycle_percent: the new PWM duty cycle as a percentage.
+        """
+
+        if (0 <= duty_cycle_percent <= 100):
+            self.duty_cycle_percent = duty_cycle_percent
+            return sysfs.PWM_Duty_Cycle_Percent(self.chip, self.pin, self.duty_cycle_percent)
+        else:
+            raise Exception("Duty cycle must br between 0 and 100. Current value: {0} is out of bounds".format(duty_cycle_percent))
+
+    def pwm_polarity(self):  # invert the polarity of the pwm
+        """
+        Invert the signal.
+        """
+        sysfs.PWM_Disable(self.chip, self.pin)
+        sysfs.PWM_Polarity(self.chip, self.pin, invert=not(self.invert_polarity))
+        sysfs.PWM_Enable(self.chip, self.pin)
+
+    def pwm_close(self):
+        """
+        remove the object from the system.
+        """
+        sysfs.PWM_Unexport(self.chip, self.pin)

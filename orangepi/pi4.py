@@ -39,7 +39,7 @@ BOARD = {
     26: 149,  # GPIO4_C5
     27: 64,   # I2C2_SDA
     28: 65,   # I2C2_SCL
- }
+}
 
 # No reason for BCM mapping, keeping it for compatibility
 BCM = BOARD
