@@ -18,10 +18,10 @@ Usage:
 # pin number = (position of letter in alphabet - 1) * 32 + pin number
 # So, PD14 will be (4 - 1) * 32 + 14 = 110
 
-import orangepi.4
+import orangepi.pi4
 
 # Orange Pi One physical board pin to GPIO pin
-BOARD = orangepi.4.BOARD
+BOARD = orangepi.pi4.BOARD
 
 # Orange Pi One BCM pin to actual GPIO pin
-BCM = orangepi.4.BCM
+BCM = orangepi.pi4.BCM
