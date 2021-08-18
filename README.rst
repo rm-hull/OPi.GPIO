@@ -16,7 +16,7 @@ OPi.GPIO
 .. image:: https://img.shields.io/pypi/v/OPi.GPIO.svg
    :target: https://pypi.python.org/pypi/OPi.GPIO
    
-.. image:: https://img.shields.io/maintenance/yes/2019.svg?maxAge=2592000
+.. image:: https://img.shields.io/maintenance/yes/2021.svg?maxAge=2592000
 
 A drop-in replacement library for `RPi.GPIO <https://sourceforge.net/projects/raspberry-gpio-python/>`_
 for the Orange Pi Zero and other SBCs. Only the basic GPIO functions are replicated,
