@@ -4,7 +4,9 @@ ChangeLog
 +------------+---------------------------------------------------------------------+------------+
 | Version    | Description                                                         | Date       |
 +============+=====================================================================+============+
-| **0.5.0**  | *  Added Hardware PWM Control                                       | 2021/04/25 |
+| **0.5.1**  | * Updated orange pi 4B mappings                                     | 2021/08/19 |
++------------+---------------------------------------------------------------------+------------+
+| **0.5.0**  | * Added Hardware PWM Control                                        | 2021/04/25 |
 |            | * Add support for the NanoPi M4 family                              |            |
 |            | * Add pin mapping for orange pi 4 & 4B models                       |            |
 |            | * Add rockpi/rockpi s packages added                                |            |
