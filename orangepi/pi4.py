@@ -39,6 +39,15 @@ BOARD = {
     26: 149,  # GPIO4_C5
     27: 64,   # I2C2_SDA
     28: 65,   # I2C2_SCL
+    29: 121,  # I2S0_RX
+    31: 122,  # I2S0_TX
+    32: 128,  # I2S_CLK
+    33: 120,  # I2S0_SCK
+    35: 123,  # I2S0_SI0
+    36: 127,  # I2S0_SO0
+    37: 124,  # I2S0_SI1
+    38: 125,  # I2S0_SI2
+    40: 126,  # I2S0_SI3
 }
 
 # No reason for BCM mapping, keeping it for compatibility
