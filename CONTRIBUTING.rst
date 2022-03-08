@@ -22,3 +22,4 @@ Contributors
 * Stephen Sorriaux (@StephenSorriaux)
 * Michael Still (@mikalstill)
 * Pascal Roeleven (@pascallj)
+* Igor Pitsyn (@ipitsyn)
