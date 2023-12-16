@@ -41,4 +41,8 @@ GPIO.RISING = 1
 GPIO.FALLING = 2
 GPIO.BOTH = 3
 
+# LEDs
+GPIO.RED = 'orangepi:red:status'
+GPIO.GREEN = 'orangepi:green:pwr'
+
 sys.modules[__name__] = GPIO

@@ -348,6 +348,45 @@ The PWM pins dont follow the GPIO numbering system so the number are quite low.
 This lists all the files associated with pwmchip0. if you successfully created an object in step 3 you will see a pwm object (for example pwm0).
 The number listed after pwm is the pin number used in PWM_pin.
 
+LEDs:
+-----
+This code was written on an OrangePi PC+ so the following examples are based on that, however any single board
+computer running linux that has a onboard leds be able to use this.
+
+To list all LEDs on the system:
+
+    .. code:: bash
+        ls -l /sys/class/leds/
+
+This will show all of the LEDs on the system for example orangepi:green:pwr.
+
+1. To turn LED ON:
+
+    .. code:: python
+
+       GPIO.setled(GPIO.RED, GPIO.HIGH)
+       # or
+       GPIO.setled(GPIO.RED, 1)
+       # or
+       GPIO.setled(GPIO.RED, True)
+
+2. To turn LED OFF:
+
+    .. code:: python
+
+       GPIO.setled(GPIO.RED, GPIO.LOW)
+       # or
+       GPIO.setled(GPIO.RED, 0)
+       # or
+       GPIO.setled(GPIO.RED, False)
+
+3. To change several LEDs states at the same time:
+
+    .. code:: python
+
+       leds_list = [GPIO.RED, GPIO.GREEN]              # also works with tuples
+       GPIO.led(leds_list, GPIO.HIGH)                  # sets both LEDs ON
+       GPIO.led(leds_list, (GPIO.HIGH, GPIO.LOW))      # sets first LED ON and second LED OFF
 
 Methods
 -------
@@ -360,6 +399,7 @@ from OPi.constants import LOW, HIGH                     # noqa: F401
 from OPi.constants import NONE, RISING, FALLING, BOTH   # noqa: F401
 from OPi.constants import BCM, BOARD, SUNXI, CUSTOM
 from OPi.constants import PUD_UP, PUD_DOWN, PUD_OFF     # noqa: F401
+from OPi.constants import RED, GREEN                    # LEDs
 from OPi.pin_mappings import get_gpio_pin, set_custom_pin_mappings
 from OPi import event, sysfs
 
@@ -525,6 +565,28 @@ def output(channel, state):
         pin = get_gpio_pin(_mode, channel)
         return sysfs.output(pin, state)
 
+def setled(led, state):
+    """
+    Set the state of a onboard LEDs.
+
+    :param led: :py:attr:`GPIO.RED` or :py:attr:`GPIO.GREEN`.
+    :param state: can be :py:attr:`0` / :py:attr:`GPIO.LOW` / :py:attr:`False`
+        or :py:attr:`1` / :py:attr:`GPIO.HIGH` / :py:attr:`True`.
+
+    **Several LEDs:**
+    You can change state of both LEDs the same call. For example:
+
+    .. code:: python
+
+       leds_list = [GPIO.RED, GPIO.GREEN]              # also works with tuples
+       GPIO.led(leds_list, GPIO.HIGH)                  # sets both LEDs ON
+       GPIO.led(leds_list, (GPIO.HIGH, GPIO.LOW))      # sets first LED ON and second LED OFF
+    """
+    if isinstance(led, list):
+        for l in led:
+            setled(l, state)
+    else:
+        return sysfs.setled(led, state)
 
 def wait_for_edge(channel, trigger, timeout=-1):
     """
