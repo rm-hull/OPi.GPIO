@@ -69,7 +69,7 @@ BOARD = {
     22: 132,    # TXD.9/GPIO4_B1
     23: 139,    # SPI3_CLK/GPIO4_B3
     24: 134,    # SPI3_CS1/GPIO4_A6
-    26: 135     # GPIO4_A7
+    26: 135,    # GPIO4_A7
     27: 32,     # SDA.3/GPIO4_A0
     28: 33,     # SCL.3/GPIO1_A1
     29: 133,    # RXD.9/GPIO4_A5
@@ -101,7 +101,7 @@ WIRINGPI = {
     22: 13,  # TXD.9/GPIO4_B1
     23: 14,  # SPI3_CLK/GPIO4_B3
     24: 15,  # SPI3_CS1/GPIO4_A6
-    26: 16   # GPIO4_A7
+    26: 16,  # GPIO4_A7
     27: 17,  # SDA.3/GPIO4_A0
     28: 18,  # SCL.3/GPIO1_A1
     29: 19,  # RXD.9/GPIO4_A5
