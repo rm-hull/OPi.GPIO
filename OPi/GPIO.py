@@ -725,15 +725,9 @@ class PWM:
         self.duty_cycle_percent = duty_cycle_percent
         self.invert_polarity = invert_polarity
 
+        # export pwm
         try:
             sysfs.PWM_Export(chip, pin)  # creates the pwm sysfs object
-            if invert_polarity is True:
-                sysfs.PWM_Polarity(chip, pin, invert=True)  # invert pwm i.e the duty cycle tells you how long the cycle is off
-            else:
-                sysfs.PWM_Polarity(chip, pin, invert=False)  # don't invert the pwm signal. This is the normal way its used.
-            sysfs.PWM_Enable(chip, pin)
-            return sysfs.PWM_Frequency(chip, pin, frequency)
-
         except (OSError, IOError) as e:
             if e.errno == 16:   # Device or resource busy
                 warnings.warn("Pin {0} is already in use, continuing anyway.".format(pin), stacklevel=2)
@@ -741,6 +735,16 @@ class PWM:
                 sysfs.PWM_Export(chip, pin)
             else:
                 raise e
+
+        # invert polarity  if needed
+        if invert_polarity is True:
+            sysfs.PWM_Polarity(chip, pin, invert=True)  # invert pwm i.e the duty cycle tells you how long the cycle is off
+        else:
+            sysfs.PWM_Polarity(chip, pin, invert=False)  # don't invert the pwm signal. This is the normal way its used.
+
+        # enable pwm
+        sysfs.PWM_Enable(chip, pin)
+        sysfs.PWM_Frequency(chip, pin, frequency)
 
     def start_pwm(self):  # turn on pwm by setting the duty cycle to what the user specified
         """
@@ -755,7 +759,7 @@ class PWM:
         return sysfs.PWM_Duty_Cycle_Percent(self.chip, self.pin, 0)  # duty cycle at 0 is the equivilant of off
 
     def change_frequency(self, new_frequency):
-        # Order of opperations:
+        # Order of operations:
         # 1. convert to period
         # 2. check if period is increasing or decreasing
         # 3. If increasing update pwm period and then update the duty cycle period
