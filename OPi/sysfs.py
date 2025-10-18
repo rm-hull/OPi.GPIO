@@ -4,7 +4,7 @@
 
 from contextlib import contextmanager
 from OPi.constants import HIGH, LOW, IN, OUT, \
-    NONE, RISING, FALLING, BOTH
+    NONE, RISING, FALLING, BOTH, RED, GREEN
 
 import os
 import time
@@ -83,6 +83,19 @@ def edge(pin, trigger):
     }
     with open(path, "w") as fp:
         fp.write(opts[trigger])
+
+@contextmanager
+def brightness_descriptor(pin, mode="r"):
+    path = "/sys/class/leds/{0}/brightness".format(pin)
+    await_permissions(path)
+    with open(os.path.abspath(path), mode) as fp:
+        yield fp
+
+def setled(led, value):
+    assert led in [RED, GREEN]
+    str_value = "1" if value else "0"
+    with brightness_descriptor(led, "w") as fp:
+        fp.write(str_value)
 
 # Hardware PWM functionality:
 #   resources: https://developer.toradex.com/knowledge-base/pwm-linux    &    https://www.faschingbauer.me/trainings/material/soup/hardware/pwm/topic.html
