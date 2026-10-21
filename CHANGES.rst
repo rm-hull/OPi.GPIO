@@ -4,9 +4,9 @@ ChangeLog
 +------------+---------------------------------------------------------------------+------------+
 | Version    | Description                                                         | Date       |
 +============+=====================================================================+============+
-| **0.5.4**  | * Added OrangePi Zero3 pin mappings                                 | 2023/08/06 |
-+------------+---------------------------------------------------------------------+------------+
-| **0.5.3**  | * Add pin mappings for Radxa Zero                                   | 2022/06/20 |
+| **0.5.3**  | * Added OrangePi Zero3 pin mappings                                 | TBC        |
+|            | * Add pin mappings for Orange Pi 5 and Orange Pi 5B                 |            |
+|            | * Add pin mappings for Radxa Zero                                   |            |
 |            | * Added OrangePi Zero2 pin mappings                                 |            |
 +------------+---------------------------------------------------------------------+------------+
 | **0.5.2**  | * Add full 40-pin header for Orange Pi 4(B)                         | 2021/10/22 |

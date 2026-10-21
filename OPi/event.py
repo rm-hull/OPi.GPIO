@@ -89,7 +89,9 @@ def blocking_wait_for_edge(pin, trigger, timeout=-1):
     assert trigger in [RISING, FALLING, BOTH]
 
     if pin in _threads:
-        raise RuntimeError("Conflicting edge detection events already exist for this GPIO channel")
+        raise RuntimeError(
+            "Conflicting edge detection events already exist for this GPIO channel"
+        )
 
     try:
         sysfs.edge(pin, trigger)
@@ -133,7 +135,9 @@ def add_edge_detect(pin, trigger, callback=None):
     assert trigger in [RISING, FALLING, BOTH]
 
     if pin in _threads:
-        raise RuntimeError("Conflicting edge detection already enabled for this GPIO channel")
+        raise RuntimeError(
+            "Conflicting edge detection already enabled for this GPIO channel"
+        )
 
     _threads[pin] = _worker(pin, trigger, callback)
     _threads[pin].start()

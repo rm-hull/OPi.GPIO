@@ -23,3 +23,4 @@ Contributors
 * Michael Still (@mikalstill)
 * Pascal Roeleven (@pascallj)
 * Igor Pitsyn (@ipitsyn)
+* Nick Rupert, Tyrannosaurus Tech (@nickrupert7)

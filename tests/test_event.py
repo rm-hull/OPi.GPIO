@@ -20,8 +20,8 @@ from OPi.constants import RISING
 
 def test_blocking_wait_for_edge_detected(fs):
     pin = 198
-    fs.CreateFile("/sys/class/gpio/gpio{0}/edge".format(pin))
-    fs.CreateFile("/sys/class/gpio/gpio{0}/value".format(pin))
+    fs.create_file("/sys/class/gpio/gpio{0}/edge".format(pin))
+    fs.create_file("/sys/class/gpio/gpio{0}/value".format(pin))
 
     with patch("select.epoll") as mock:
         mock.return_value.poll.return_value = [(pin, 23)]
@@ -30,8 +30,8 @@ def test_blocking_wait_for_edge_detected(fs):
 
 def test_blocking_wait_for_edge_timeout(fs):
     pin = 68
-    fs.CreateFile("/sys/class/gpio/gpio{0}/edge".format(pin))
-    fs.CreateFile("/sys/class/gpio/gpio{0}/value".format(pin))
+    fs.create_file("/sys/class/gpio/gpio{0}/edge".format(pin))
+    fs.create_file("/sys/class/gpio/gpio{0}/value".format(pin))
 
     with patch("select.epoll"):
         assert event.blocking_wait_for_edge(pin, RISING, timeout=0.01) is None
@@ -52,8 +52,8 @@ def test_event_detected_not_configured():
 
 def test_edge_detected(fs):
     pin = 23
-    fs.CreateFile("/sys/class/gpio/gpio{0}/edge".format(pin))
-    fs.CreateFile("/sys/class/gpio/gpio{0}/value".format(pin))
+    fs.create_file("/sys/class/gpio/gpio{0}/edge".format(pin))
+    fs.create_file("/sys/class/gpio/gpio{0}/value".format(pin))
 
     with patch("select.epoll") as mock:
         try:
@@ -73,8 +73,8 @@ def test_edge_detected(fs):
 
 def test_add_edge_detect_called_twice_throws_error(fs):
     pin = 43
-    fs.CreateFile("/sys/class/gpio/gpio{0}/edge".format(pin))
-    fs.CreateFile("/sys/class/gpio/gpio{0}/value".format(pin))
+    fs.create_file("/sys/class/gpio/gpio{0}/edge".format(pin))
+    fs.create_file("/sys/class/gpio/gpio{0}/value".format(pin))
 
     with patch("select.epoll"):
         try:
@@ -91,8 +91,8 @@ def test_add_edge_detect_called_twice_throws_error(fs):
 
 def test_blocking_wait_raises_error_add_edge_detect_already_active(fs):
     pin = 66
-    fs.CreateFile("/sys/class/gpio/gpio{0}/edge".format(pin))
-    fs.CreateFile("/sys/class/gpio/gpio{0}/value".format(pin))
+    fs.create_file("/sys/class/gpio/gpio{0}/edge".format(pin))
+    fs.create_file("/sys/class/gpio/gpio{0}/value".format(pin))
 
     with patch("select.epoll"):
         try:
@@ -110,8 +110,8 @@ def test_blocking_wait_raises_error_add_edge_detect_already_active(fs):
 
 def test_callback_raises_error(fs):
     pin = 194
-    fs.CreateFile("/sys/class/gpio/gpio{0}/edge".format(pin))
-    fs.CreateFile("/sys/class/gpio/gpio{0}/value".format(pin))
+    fs.create_file("/sys/class/gpio/gpio{0}/edge".format(pin))
+    fs.create_file("/sys/class/gpio/gpio{0}/value".format(pin))
 
     def cb(p):
         raise RuntimeError("test exception")
@@ -134,8 +134,8 @@ def test_callback_raises_error(fs):
 
 def test_add_edge_callback(fs):
     pin = 71
-    fs.CreateFile("/sys/class/gpio/gpio{0}/edge".format(pin))
-    fs.CreateFile("/sys/class/gpio/gpio{0}/value".format(pin))
+    fs.create_file("/sys/class/gpio/gpio{0}/edge".format(pin))
+    fs.create_file("/sys/class/gpio/gpio{0}/value".format(pin))
 
     called = {}
 

@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.11, 3.12, 3.13, 3.14]
+        include:
+          - python-version: 3.11
+            env: TOXENV=qa
+
+    env:
+      TOX_PARALLEL_NO_SPINNER: 1
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox coveralls setuptools
+
+      - name: Run tests
+        run: |
+          TOXENV="${{ matrix.env.TOXENV }}"
+          if [ -z "$TOXENV" ]; then
+            TOXENV="py$(echo "${{ matrix.python-version }}" | tr -d '.')"
+          fi
+          tox -vv
+        env:
+          TOXENV: $TOXENV
+
+      - name: Upload coverage to Coveralls (only for 3.11)
+        if: matrix.python-version == '3.11' && success()
+        run: coveralls
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

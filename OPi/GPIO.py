@@ -348,6 +348,45 @@ The PWM pins dont follow the GPIO numbering system so the number are quite low.
 This lists all the files associated with pwmchip0. if you successfully created an object in step 3 you will see a pwm object (for example pwm0).
 The number listed after pwm is the pin number used in PWM_pin.
 
+LEDs:
+-----
+This code was written on an OrangePi PC+ so the following examples are based on that, however any single board
+computer running linux that has a onboard leds be able to use this.
+
+To list all LEDs on the system:
+
+    .. code:: bash
+        ls -l /sys/class/leds/
+
+This will show all of the LEDs on the system for example orangepi:green:pwr.
+
+1. To turn LED ON:
+
+    .. code:: python
+
+       GPIO.setled(GPIO.RED, GPIO.HIGH)
+       # or
+       GPIO.setled(GPIO.RED, 1)
+       # or
+       GPIO.setled(GPIO.RED, True)
+
+2. To turn LED OFF:
+
+    .. code:: python
+
+       GPIO.setled(GPIO.RED, GPIO.LOW)
+       # or
+       GPIO.setled(GPIO.RED, 0)
+       # or
+       GPIO.setled(GPIO.RED, False)
+
+3. To change several LEDs states at the same time:
+
+    .. code:: python
+
+       leds_list = [GPIO.RED, GPIO.GREEN]              # also works with tuples
+       GPIO.led(leds_list, GPIO.HIGH)                  # sets both LEDs ON
+       GPIO.led(leds_list, (GPIO.HIGH, GPIO.LOW))      # sets first LED ON and second LED OFF
 
 Methods
 -------
@@ -356,10 +395,11 @@ Methods
 import warnings
 
 from OPi.constants import IN, OUT
-from OPi.constants import LOW, HIGH                     # noqa: F401
-from OPi.constants import NONE, RISING, FALLING, BOTH   # noqa: F401
+from OPi.constants import LOW, HIGH  # noqa: F401
+from OPi.constants import NONE, RISING, FALLING, BOTH  # noqa: F401
 from OPi.constants import BCM, BOARD, SUNXI, CUSTOM
-from OPi.constants import PUD_UP, PUD_DOWN, PUD_OFF     # noqa: F401
+from OPi.constants import PUD_UP, PUD_DOWN, PUD_OFF  # noqa: F401
+from OPi.constants import RED, GREEN  # noqa: F401
 from OPi.pin_mappings import get_gpio_pin, set_custom_pin_mappings
 from OPi import event, sysfs
 
@@ -396,7 +436,7 @@ def setmode(mode):
         :py:attr:`GPIO.SUNXI`, or a `dict` or `object` representing a custom
         pin mapping.
     """
-    if hasattr(mode, '__getitem__'):
+    if hasattr(mode, "__getitem__"):
         set_custom_pin_mappings(mode)
         mode = CUSTOM
 
@@ -459,7 +499,10 @@ def setup(channel, direction, initial=None, pull_up_down=None):
 
     if pull_up_down is not None:
         if _gpio_warnings:
-            warnings.warn("Pull up/down setting are not (yet) fully supported, continuing anyway. Use GPIO.setwarnings(False) to disable warnings.", stacklevel=2)
+            warnings.warn(
+                "Pull up/down setting are not (yet) fully supported, continuing anyway. Use GPIO.setwarnings(False) to disable warnings.",
+                stacklevel=2,
+            )
 
     if isinstance(channel, list):
         for ch in channel:
@@ -471,9 +514,14 @@ def setup(channel, direction, initial=None, pull_up_down=None):
         try:
             sysfs.export(pin)
         except (OSError, IOError) as e:
-            if e.errno == 16:   # Device or resource busy
+            if e.errno == 16:  # Device or resource busy
                 if _gpio_warnings:
-                    warnings.warn("Channel {0} is already in use, continuing anyway. Use GPIO.setwarnings(False) to disable warnings.".format(channel), stacklevel=2)
+                    warnings.warn(
+                        "Channel {0} is already in use, continuing anyway. Use GPIO.setwarnings(False) to disable warnings.".format(
+                            channel
+                        ),
+                        stacklevel=2,
+                    )
                 sysfs.unexport(pin)
                 sysfs.export(pin)
             else:
@@ -524,6 +572,30 @@ def output(channel, state):
         _check_configured(channel, direction=OUT)
         pin = get_gpio_pin(_mode, channel)
         return sysfs.output(pin, state)
+
+
+def setled(led, state):
+    """
+    Set the state of a onboard LEDs.
+
+    :param led: :py:attr:`GPIO.RED` or :py:attr:`GPIO.GREEN`.
+    :param state: can be :py:attr:`0` / :py:attr:`GPIO.LOW` / :py:attr:`False`
+        or :py:attr:`1` / :py:attr:`GPIO.HIGH` / :py:attr:`True`.
+
+    **Several LEDs:**
+    You can change state of both LEDs the same call. For example:
+
+    .. code:: python
+
+       leds_list = [GPIO.RED, GPIO.GREEN]              # also works with tuples
+       GPIO.led(leds_list, GPIO.HIGH)                  # sets both LEDs ON
+       GPIO.led(leds_list, (GPIO.HIGH, GPIO.LOW))      # sets first LED ON and second LED OFF
+    """
+    if isinstance(led, list):
+        for led_item in led:
+            setled(led_item, state)
+    else:
+        return sysfs.setled(led, state)
 
 
 def wait_for_edge(channel, trigger, timeout=-1):
@@ -593,7 +665,10 @@ def add_event_detect(channel, trigger, callback=None, bouncetime=None):
 
     if bouncetime is not None:
         if _gpio_warnings:
-            warnings.warn("bouncetime is not (yet) fully supported, continuing anyway. Use GPIO.setwarnings(False) to disable warnings.", stacklevel=2)
+            warnings.warn(
+                "bouncetime is not (yet) fully supported, continuing anyway. Use GPIO.setwarnings(False) to disable warnings.",
+                stacklevel=2,
+            )
 
     pin = get_gpio_pin(_mode, channel)
     event.add_edge_detect(pin, trigger, __wrap(callback, channel))
@@ -620,7 +695,10 @@ def add_event_callback(channel, callback, bouncetime=None):
 
     if bouncetime is not None:
         if _gpio_warnings:
-            warnings.warn("bouncetime is not (yet) fully supported, continuing anyway. Use GPIO.setwarnings(False) to disable warnings.", stacklevel=2)
+            warnings.warn(
+                "bouncetime is not (yet) fully supported, continuing anyway. Use GPIO.setwarnings(False) to disable warnings.",
+                stacklevel=2,
+            )
 
     pin = get_gpio_pin(_mode, channel)
     event.add_edge_callback(pin, __wrap(callback, channel))
@@ -706,8 +784,9 @@ class PWM:
     # 2. find way to check _exports against _exports_pwm to make sure there is no overlap.
     # 3. Create map of pwm pins to various boards.
 
-    def __init__(self, chip, pin, frequency, duty_cycle_percent, invert_polarity=False):  # (pwm pin, frequency in KHz)
-
+    def __init__(
+        self, chip, pin, frequency, duty_cycle_percent, invert_polarity=False
+    ):  # (pwm pin, frequency in KHz)
         """
         Setup the PWM object to control.
 
@@ -725,37 +804,54 @@ class PWM:
         self.duty_cycle_percent = duty_cycle_percent
         self.invert_polarity = invert_polarity
 
+        # export pwm
         try:
             sysfs.PWM_Export(chip, pin)  # creates the pwm sysfs object
-            if invert_polarity is True:
-                sysfs.PWM_Polarity(chip, pin, invert=True)  # invert pwm i.e the duty cycle tells you how long the cycle is off
-            else:
-                sysfs.PWM_Polarity(chip, pin, invert=False)  # don't invert the pwm signal. This is the normal way its used.
-            sysfs.PWM_Enable(chip, pin)
-            return sysfs.PWM_Frequency(chip, pin, frequency)
-
         except (OSError, IOError) as e:
-            if e.errno == 16:   # Device or resource busy
-                warnings.warn("Pin {0} is already in use, continuing anyway.".format(pin), stacklevel=2)
+            if e.errno == 16:  # Device or resource busy
+                warnings.warn(
+                    "Pin {0} is already in use, continuing anyway.".format(pin),
+                    stacklevel=2,
+                )
                 sysfs.PWM_Unexport(chip, pin)
                 sysfs.PWM_Export(chip, pin)
             else:
                 raise e
 
-    def start_pwm(self):  # turn on pwm by setting the duty cycle to what the user specified
+        # invert polarity  if needed
+        if invert_polarity is True:
+            sysfs.PWM_Polarity(
+                chip, pin, invert=True
+            )  # invert pwm i.e the duty cycle tells you how long the cycle is off
+        else:
+            sysfs.PWM_Polarity(
+                chip, pin, invert=False
+            )  # don't invert the pwm signal. This is the normal way its used.
+
+        # enable pwm
+        sysfs.PWM_Enable(chip, pin)
+        sysfs.PWM_Frequency(chip, pin, frequency)
+
+    def start_pwm(
+        self,
+    ):  # turn on pwm by setting the duty cycle to what the user specified
         """
         Start PWM Signal.
         """
-        return sysfs.PWM_Duty_Cycle_Percent(self.chip, self.pin, self.duty_cycle_percent)  # duty cycle controls the on-off
+        return sysfs.PWM_Duty_Cycle_Percent(
+            self.chip, self.pin, self.duty_cycle_percent
+        )  # duty cycle controls the on-off
 
     def stop_pwm(self):  # turn on pwm by setting the duty cycle to 0
         """
         Stop PWM Signal.
         """
-        return sysfs.PWM_Duty_Cycle_Percent(self.chip, self.pin, 0)  # duty cycle at 0 is the equivilant of off
+        return sysfs.PWM_Duty_Cycle_Percent(
+            self.chip, self.pin, 0
+        )  # duty cycle at 0 is the equivilant of off
 
     def change_frequency(self, new_frequency):
-        # Order of opperations:
+        # Order of operations:
         # 1. convert to period
         # 2. check if period is increasing or decreasing
         # 3. If increasing update pwm period and then update the duty cycle period
@@ -776,7 +872,7 @@ class PWM:
 
         old_pwm_period = int(round((1 / self.frequency) * 1e9, 0))
 
-        if (pwm_period > old_pwm_period):  # if increasing
+        if pwm_period > old_pwm_period:  # if increasing
             sysfs.PWM_Period(self.chip, self.pin, pwm_period)  # update the pwm period
             sysfs.PWM_Duty_Cycle(self.chip, self.pin, duty_cycle)  # update duty cycle
 
@@ -793,18 +889,24 @@ class PWM:
         :param duty_cycle_percent: the new PWM duty cycle as a percentage.
         """
 
-        if (0 <= duty_cycle_percent <= 100):
+        if 0 <= duty_cycle_percent <= 100:
             self.duty_cycle_percent = duty_cycle_percent
-            return sysfs.PWM_Duty_Cycle_Percent(self.chip, self.pin, self.duty_cycle_percent)
+            return sysfs.PWM_Duty_Cycle_Percent(
+                self.chip, self.pin, self.duty_cycle_percent
+            )
         else:
-            raise Exception("Duty cycle must br between 0 and 100. Current value: {0} is out of bounds".format(duty_cycle_percent))
+            raise Exception(
+                "Duty cycle must br between 0 and 100. Current value: {0} is out of bounds".format(
+                    duty_cycle_percent
+                )
+            )
 
     def pwm_polarity(self):  # invert the polarity of the pwm
         """
         Invert the signal.
         """
         sysfs.PWM_Disable(self.chip, self.pin)
-        sysfs.PWM_Polarity(self.chip, self.pin, invert=not(self.invert_polarity))
+        sysfs.PWM_Polarity(self.chip, self.pin, invert=not (self.invert_polarity))
         sysfs.PWM_Enable(self.chip, self.pin)
 
     def pwm_close(self):

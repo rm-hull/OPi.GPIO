@@ -15,7 +15,11 @@ import pytest
 import OPi.GPIO as GPIO
 
 
-def setup():
+@pytest.fixture(autouse=True)
+def run_around_tests():
+    # Code that will run before each test
+    yield
+    # Code that will run after each test
     with patch("OPi.GPIO.sysfs"):
         GPIO.cleanup()
 
@@ -24,8 +28,6 @@ def test_mode():
     assert GPIO.getmode() is None
     GPIO.setmode(GPIO.BCM)
     assert GPIO.getmode() == GPIO.BCM
-    GPIO.cleanup()
-    assert GPIO.getmode() is None
     with pytest.raises(AssertionError):
         GPIO.setmode(54335)
 
@@ -296,7 +298,6 @@ def test_callback_wrapper_not_none():
 
 
 def test_custom_dict():
-    GPIO.cleanup()
     assert GPIO.getmode() is None
     with patch("OPi.GPIO.sysfs") as mock:
         GPIO.setmode({"A": 5, "B": 37})
@@ -312,7 +313,6 @@ def test_custom_object():
         def __getitem__(self, value):
             return value + 4
 
-    GPIO.cleanup()
     assert GPIO.getmode() is None
     with patch("OPi.GPIO.sysfs") as mock:
         GPIO.setmode(mapper())
