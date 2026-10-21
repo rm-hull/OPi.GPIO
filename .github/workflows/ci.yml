@@ -34,9 +34,14 @@ jobs:
           pip install tox coveralls setuptools
 
       - name: Run tests
-        run: tox -vv
+        run: |
+          TOXENV="${{ matrix.env.TOXENV }}"
+          if [ -z "$TOXENV" ]; then
+            TOXENV="py$(echo "${{ matrix.python-version }}" | tr -d '.')"
+          fi
+          tox -vv
         env:
-          TOXENV: ${{ matrix.env.TOXENV || replace(format('py{0}', matrix.python-version), '.', '') }}
+          TOXENV: $TOXENV
 
       - name: Upload coverage to Coveralls (only for 3.11)
         if: matrix.python-version == '3.11' && success()
