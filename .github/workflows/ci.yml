@@ -36,7 +36,7 @@ jobs:
       - name: Run tests
         run: tox -vv
         env:
-          TOXENV: ${{ matrix.env.TOXENV || format('py{0}', matrix.python-version) | replace('.', '') }}
+          TOXENV: ${{ matrix.env.TOXENV || replace(format('py{0}', matrix.python-version), '.', '') }}
 
       - name: Upload coverage to Coveralls (only for 3.11)
         if: matrix.python-version == '3.11' && success()
